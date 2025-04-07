@@ -21,6 +21,7 @@ import { initializeI18n } from "./i18n"
 import { DIFF_VIEW_URI_SCHEME } from "./integrations/editor/DiffViewProvider"
 import { TerminalRegistry } from "./integrations/terminal/TerminalRegistry"
 import { ConfigBridgeServer } from "./services/bridge/ipc-server"
+import { CliInstaller } from "./services/cli/CliInstaller"
 import { McpServerManager } from "./services/mcp/McpServerManager"
 import { telemetryService } from "./services/telemetry/TelemetryService"
 import { migrateSettings } from "./utils/migrateSettings"
@@ -39,6 +40,7 @@ import { formatLanguage } from "./shared/language"
 let outputChannel: vscode.OutputChannel
 let extensionContext: vscode.ExtensionContext
 let configBridgeServer: ConfigBridgeServer
+let cliInstaller: CliInstaller
 
 // This method is called when your extension is activated.
 // Your extension is activated the very first time the command is executed.
@@ -75,6 +77,12 @@ export async function activate(context: vscode.ExtensionContext) {
 	configBridgeServer = new ConfigBridgeServer(context, provider.providerSettingsManager, outputChannel)
 	configBridgeServer.start().catch((error) => {
 		outputChannel.appendLine(`Failed to start Roo Configuration Bridge: ${error}`)
+	})
+
+	// Initialize and install the CLI
+	cliInstaller = new CliInstaller(context, outputChannel)
+	cliInstaller.installCli().catch((error) => {
+		outputChannel.appendLine(`Failed to install Roo CLI: ${error}`)
 	})
 
 	context.subscriptions.push(

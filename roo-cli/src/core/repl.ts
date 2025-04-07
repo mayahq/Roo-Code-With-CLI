@@ -2,7 +2,7 @@
 
 import chalk from "chalk"
 import fs from "fs/promises"
-import { marked, Renderer } from "marked" // Import Renderer type
+import { marked, Renderer, Tokens } from "marked" // Import Renderer and Tokens types
 import { stdin as input, stdout as output } from "node:process"
 import * as readline from "node:readline/promises"
 import path from "path"
@@ -12,18 +12,18 @@ import { Agent } from "./agent.js"
 const customRenderer: Partial<Renderer> = {
 	// Note: 'this' context inside these functions refers to the renderer instance being used by marked.
 
-	code(code: string, language: string | undefined): string {
-		// This signature seems to be what marked v13 actually uses, despite TS types suggesting otherwise sometimes.
-		// Let's try styling based on this simpler signature.
-		if (language) {
-			return `\n${chalk.cyan(code)}\n` // Add newlines for block spacing
+	code({ text, lang, escaped }: Tokens.Code): string {
+		// Updated to match the expected interface
+		if (lang) {
+			return `\n${chalk.cyan(text)}\n` // Add newlines for block spacing
 		}
-		return `\n${code}\n` // Add newlines for block spacing
+		return `\n${text}\n` // Add newlines for block spacing
 	},
 
-	heading(text: string, level: 1 | 2 | 3 | 4 | 5 | 6): string {
-		// This simpler signature also seems common in examples.
-		switch (level) {
+	heading({ tokens, depth }: Tokens.Heading): string {
+		// Updated to match the expected interface
+		const text = marked.parseInline(tokens.map((t) => t.raw || "").join(""))
+		switch (depth) {
 			case 1:
 				return chalk.bold.magenta(`\n# ${text}\n`)
 			case 2:
@@ -31,36 +31,43 @@ const customRenderer: Partial<Renderer> = {
 			case 3:
 				return chalk.bold.green(`\n### ${text}\n`)
 			default:
-				return chalk.bold(`\n${"#".repeat(level)} ${text}\n`)
+				return chalk.bold(`\n${"#".repeat(depth)} ${text}\n`)
 		}
 	},
 
-	strong(text: string): string {
-		// 'text' here contains the already parsed inner content.
+	strong({ tokens }: Tokens.Strong): string {
+		// Updated to match the expected interface
+		const text = marked.parseInline(tokens.map((t) => t.raw || "").join(""))
 		return chalk.bold(text)
 	},
 
-	em(text: string): string {
-		// 'text' here contains the already parsed inner content.
+	em({ tokens }: Tokens.Em): string {
+		// Updated to match the expected interface
+		const text = marked.parseInline(tokens.map((t) => t.raw || "").join(""))
 		return chalk.italic(text)
 	},
 
-	listitem(text: string, task: boolean, checked: boolean): string {
-		// 'text' contains the rendered content of the list item.
+	listitem(item: Tokens.ListItem): string {
+		// Updated to match the expected interface
+		const text = marked.parseInline(item.tokens.map((t: any) => t.raw || "").join(""))
+		const task = item.task || false
+		const checked = item.checked || false
+
 		const marker = task ? (checked ? "[x] " : "[ ] ") : "* "
 		// Avoid adding extra newline if text already ends with one (common for nested lists)
-		return `${marker}${text}${text.endsWith("\n") ? "" : "\n"}`
+		const textStr = String(text) // Ensure text is a string
+		return `${marker}${textStr}${textStr.endsWith("\n") ? "" : "\n"}`
 	},
 
-	link(href: string, title: string | null | undefined, text: string): string {
-		// 'text' contains the rendered link text.
-		// Use the default renderer's link generation and style it.
-		const defaultLink = Renderer.prototype.link.call(this, href, title, text)
-		return chalk.underline.blue(defaultLink)
+	link({ href, title, tokens }: Tokens.Link): string {
+		// Updated to match the expected interface
+		const text = marked.parseInline(tokens.map((t) => t.raw || "").join(""))
+		return chalk.underline.blue(`[${text}](${href})${title ? ` "${title}"` : ""}`)
 	},
 
-	paragraph(text: string): string {
-		// 'text' contains the rendered paragraph content.
+	paragraph({ tokens }: Tokens.Paragraph): string {
+		// Updated to match the expected interface
+		const text = marked.parseInline(tokens.map((t) => t.raw || "").join(""))
 		// Add extra line break after paragraphs for better spacing.
 		return text + "\n\n" // Add two newlines for spacing
 	},

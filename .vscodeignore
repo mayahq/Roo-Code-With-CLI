@@ -9,6 +9,11 @@ evals/**
 e2e/**
 node_modules/**
 src/**
+# Include CLI files but exclude source
+roo-cli/src/**
+roo-cli/node_modules/**
+roo-cli/tsconfig.json
+!dist/roo-cli/**
 .gitignore
 .yarnrc
 esbuild.js

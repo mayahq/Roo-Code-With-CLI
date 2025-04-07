@@ -1,10 +1,9 @@
 {
-	"name": "roo-cline",
-	"displayName": "Roo Code (prev. Roo Cline)",
+	"name": "roo-cline-with-cli",
+	"displayName": "Roo Code (prev. Roo Cline) With CLI",
 	"description": "A whole dev team of AI agents in your editor.",
-	"publisher": "RooVeterinaryInc",
+	"publisher": "mayalabs",
 	"version": "3.11.8",
-	"icon": "assets/icons/icon.png",
 	"galleryBanner": {
 		"color": "#617A91",
 		"theme": "dark"
@@ -14,13 +13,13 @@
 		"node": "20.18.1"
 	},
 	"author": {
-		"name": "Roo Code"
+		"name": "Maya Labs"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/RooVetGit/Roo-Code"
+		"url": "https://github.com/mayahq/Roo-Code-With-CLI"
 	},
-	"homepage": "https://github.com/RooVetGit/Roo-Code",
+	"homepage": "https://github.com/mayahq/Roo-Code-With-CLI",
 	"categories": [
 		"AI",
 		"Chat",
@@ -370,7 +369,8 @@
 		}
 	},
 	"scripts": {
-		"build": "npm run vsix",
+		"build": "npm run prepare-cli && npm run vsix",
+		"prepare-cli": "node scripts/prepare-cli.js",
 		"build:webview": "cd webview-ui && npm run build",
 		"build:esbuild": "node esbuild.js --production",
 		"compile": "tsc -p . --outDir out && node esbuild.js",
@@ -378,6 +378,8 @@
 		"install-extension": "npm install",
 		"install-webview": "cd webview-ui && npm install",
 		"install-e2e": "cd e2e && npm install",
+		"install-cli": "cd roo-cli && npm install",
+		"postinstall": "npm run install-cli",
 		"lint": "npm-run-all -l -p lint:*",
 		"lint:extension": "eslint src --ext ts",
 		"lint:webview": "cd webview-ui && npm run lint",

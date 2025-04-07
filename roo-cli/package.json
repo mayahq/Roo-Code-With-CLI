@@ -1,6 +1,6 @@
 {
 	"name": "roo-cli",
-	"version": "0.0.1",
+	"version": "3.11.8",
 	"description": "Command Line Interface for Roo",
 	"main": "dist/cli.js",
 	"type": "module",

@@ -1,6 +1,6 @@
-import * as vscode from "vscode"
 import * as dotenvx from "@dotenvx/dotenvx"
 import * as path from "path"
+import * as vscode from "vscode"
 
 // Load environment variables from .env file
 try {
@@ -14,17 +14,18 @@ try {
 
 import "./utils/path" // Necessary to have access to String.prototype.toPosix.
 
-import { initializeI18n } from "./i18n"
-import { ClineProvider } from "./core/webview/ClineProvider"
 import { CodeActionProvider } from "./core/CodeActionProvider"
+import { ClineProvider } from "./core/webview/ClineProvider"
+import { API } from "./exports/api"
+import { initializeI18n } from "./i18n"
 import { DIFF_VIEW_URI_SCHEME } from "./integrations/editor/DiffViewProvider"
+import { TerminalRegistry } from "./integrations/terminal/TerminalRegistry"
+import { ConfigBridgeServer } from "./services/bridge/ipc-server"
 import { McpServerManager } from "./services/mcp/McpServerManager"
 import { telemetryService } from "./services/telemetry/TelemetryService"
-import { TerminalRegistry } from "./integrations/terminal/TerminalRegistry"
-import { API } from "./exports/api"
 import { migrateSettings } from "./utils/migrateSettings"
 
-import { handleUri, registerCommands, registerCodeActions, registerTerminalActions } from "./activate"
+import { handleUri, registerCodeActions, registerCommands, registerTerminalActions } from "./activate"
 import { formatLanguage } from "./shared/language"
 
 /**
@@ -37,6 +38,7 @@ import { formatLanguage } from "./shared/language"
 
 let outputChannel: vscode.OutputChannel
 let extensionContext: vscode.ExtensionContext
+let configBridgeServer: ConfigBridgeServer
 
 // This method is called when your extension is activated.
 // Your extension is activated the very first time the command is executed.
@@ -68,6 +70,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	const provider = new ClineProvider(context, outputChannel, "sidebar")
 	telemetryService.setProvider(provider)
+
+	// Initialize and start the configuration bridge server
+	configBridgeServer = new ConfigBridgeServer(context, provider.providerSettingsManager, outputChannel)
+	configBridgeServer.start().catch((error) => {
+		outputChannel.appendLine(`Failed to start Roo Configuration Bridge: ${error}`)
+	})
 
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider(ClineProvider.sideBarId, provider, {
@@ -133,4 +141,7 @@ export async function deactivate() {
 
 	// Clean up terminal handlers
 	TerminalRegistry.cleanup()
+
+	// Stop the configuration bridge server
+	configBridgeServer?.stop()
 }

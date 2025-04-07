@@ -152,4 +152,11 @@ export async function deactivate() {
 
 	// Stop the configuration bridge server
 	configBridgeServer?.stop()
+
+	// Uninstall the CLI
+	try {
+		await cliInstaller?.uninstallCli()
+	} catch (error) {
+		outputChannel.appendLine(`Failed to uninstall Roo CLI: ${error}`)
+	}
 }

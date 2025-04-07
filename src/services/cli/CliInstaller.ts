@@ -10,6 +10,7 @@ import * as vscode from "vscode"
 export class CliInstaller {
 	private outputChannel: vscode.OutputChannel
 	private extensionPath: string
+	private isInstalled: boolean = false
 
 	constructor(context: vscode.ExtensionContext, outputChannel: vscode.OutputChannel) {
 		this.outputChannel = outputChannel
@@ -57,15 +58,45 @@ export class CliInstaller {
 			fs.writeFileSync(path.join(tempDir, "package.json"), JSON.stringify(packageJson, null, 2))
 
 			// Install the CLI globally
-			this.executeCommand("npm", ["install", "-g", tempDir], { cwd: tempDir })
+			await this.executeCommand("npm", ["install", "-g", tempDir], { cwd: tempDir })
 				.then(() => {
+					this.isInstalled = true
 					this.outputChannel.appendLine("Roo CLI installed successfully")
 				})
 				.catch((error) => {
+					this.isInstalled = false
 					this.outputChannel.appendLine(`Failed to install Roo CLI: ${error}`)
 				})
 		} catch (error) {
 			this.outputChannel.appendLine(`Error installing Roo CLI: ${error}`)
+		}
+	}
+
+	/**
+	 * Uninstall the CLI globally
+	 */
+	public async uninstallCli(): Promise<void> {
+		try {
+			if (!this.isInstalled) {
+				this.outputChannel.appendLine(
+					"Roo CLI was not installed by this extension instance, skipping uninstall",
+				)
+				return
+			}
+
+			this.outputChannel.appendLine("Uninstalling Roo CLI...")
+
+			// Uninstall the CLI globally
+			await this.executeCommand("npm", ["uninstall", "-g", "roo-cli"], {})
+				.then(() => {
+					this.isInstalled = false
+					this.outputChannel.appendLine("Roo CLI uninstalled successfully")
+				})
+				.catch((error) => {
+					this.outputChannel.appendLine(`Failed to uninstall Roo CLI: ${error}`)
+				})
+		} catch (error) {
+			this.outputChannel.appendLine(`Error uninstalling Roo CLI: ${error}`)
 		}
 	}
 

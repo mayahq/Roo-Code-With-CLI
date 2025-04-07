@@ -340,8 +340,28 @@
 					"type": "string",
 					"default": "",
 					"description": "Custom storage path. Leave empty to use the default location. Supports absolute paths (e.g. 'D:\\RooCodeStorage')"
+				},
+				"roo.bridge.enabled": {
+					"type": "boolean",
+					"default": false,
+					"description": "Enable the Roo Configuration Bridge server for CLI tool communication"
+				},
+				"roo.bridge.port": {
+					"type": "number",
+					"default": 30001,
+					"description": "Port for the Roo Configuration Bridge server"
+				},
+				"roo.bridge.secret": {
+					"type": "string",
+					"default": "",
+					"description": "Secret token for authenticating with the Roo Configuration Bridge server (recommended to store via VS Code secrets)"
 				}
 			}
+		},
+		"roo.bridge.enabled": {
+			"type": "boolean",
+			"default": false,
+			"description": "Enable the Roo Configuration Bridge for CLI tools"
 		}
 	},
 	"scripts": {

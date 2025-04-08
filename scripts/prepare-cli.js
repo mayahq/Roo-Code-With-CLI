@@ -22,15 +22,23 @@ if (fs.existsSync(cliSrcDir)) {
 		// Change to the CLI directory
 		process.chdir(cliSrcDir)
 
-		// Install dependencies if needed
-		if (!fs.existsSync(path.join(cliSrcDir, "node_modules"))) {
-			console.log("Installing CLI dependencies...")
+		// Always install dependencies to ensure they're up to date
+		console.log("Installing CLI dependencies...")
+		try {
 			execSync("npm install", { stdio: "inherit" })
+		} catch (error) {
+			console.error("Failed to install CLI dependencies:", error.message)
+			process.exit(1)
 		}
 
 		// Build the CLI
 		console.log("Running CLI build...")
-		execSync("npm run build", { stdio: "inherit" })
+		try {
+			execSync("npm run build", { stdio: "inherit" })
+		} catch (error) {
+			console.error("Failed to build CLI:", error.message)
+			process.exit(1)
+		}
 
 		// Change back to the original directory
 		process.chdir(path.join(__dirname, ".."))

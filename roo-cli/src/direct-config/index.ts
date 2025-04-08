@@ -33,7 +33,7 @@ const getPossibleVSCodePaths = (): string[] => {
 					variant,
 					"User",
 					"globalStorage",
-					"rooveterinaryinc.roo-cline-with-cli",
+					"mayalabs.roo-cline-with-cli",
 				),
 			)
 		}
@@ -48,16 +48,14 @@ const getPossibleVSCodePaths = (): string[] => {
 					variant,
 					"User",
 					"globalStorage",
-					"rooveterinaryinc.roo-cline-with-cli",
+					"mayalabs.roo-cline-with-cli",
 				),
 			)
 		}
 	} else {
 		// Linux and others
 		for (const variant of VS_CODE_VARIANTS) {
-			paths.push(
-				path.join(homeDir, ".config", variant, "User", "globalStorage", "rooveterinaryinc.roo-cline-with-cli"),
-			)
+			paths.push(path.join(homeDir, ".config", variant, "User", "globalStorage", "mayalabs.roo-cline-with-cli"))
 		}
 	}
 
@@ -81,7 +79,7 @@ const getPossibleSecretsPaths = (): string[] => {
 					variant,
 					"User",
 					"secrets",
-					"rooveterinaryinc.roo-cline-with-cli",
+					"mayalabs.roo-cline-with-cli",
 				),
 			)
 		}
@@ -89,21 +87,13 @@ const getPossibleSecretsPaths = (): string[] => {
 		// Windows
 		for (const variant of VS_CODE_VARIANTS) {
 			paths.push(
-				path.join(
-					homeDir,
-					"AppData",
-					"Roaming",
-					variant,
-					"User",
-					"secrets",
-					"rooveterinaryinc.roo-cline-with-cli",
-				),
+				path.join(homeDir, "AppData", "Roaming", variant, "User", "secrets", "mayalabs.roo-cline-with-cli"),
 			)
 		}
 	} else {
 		// Linux and others
 		for (const variant of VS_CODE_VARIANTS) {
-			paths.push(path.join(homeDir, ".config", variant, "User", "secrets", "rooveterinaryinc.roo-cline-with-cli"))
+			paths.push(path.join(homeDir, ".config", variant, "User", "secrets", "mayalabs.roo-cline-with-cli"))
 		}
 	}
 

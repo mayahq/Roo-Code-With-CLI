@@ -141,5 +141,5 @@ export function mergeJson(
 }
 
 function getExtensionUri(): vscode.Uri {
-	return vscode.extensions.getExtension("rooveterinaryinc.roo-cline-with-cli")!.extensionUri
+	return vscode.extensions.getExtension("mayalabs.roo-cline-with-cli")!.extensionUri
 }

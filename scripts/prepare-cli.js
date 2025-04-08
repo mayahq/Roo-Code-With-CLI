@@ -103,6 +103,9 @@ function copyDirectory(source, destination) {
 			copyDirectory(sourcePath, destPath)
 		} else {
 			fs.copyFileSync(sourcePath, destPath)
+
+			// Set executable permissions for CLI entry point files
+			setExecutablePermissionsIfNeeded(destPath, file)
 		}
 	}
 }
@@ -127,5 +130,44 @@ function removeDirectory(directory) {
 		fs.rmdirSync(directory)
 	}
 }
+
+/**
+ * Set executable permissions on CLI entry point files
+ */
+function setExecutablePermissionsIfNeeded(filePath, fileName) {
+	// List of CLI entry point files that should be executable
+	const executableFiles = ["cli.js", "repl.js", "index.js"]
+
+	// Check if this is a CLI entry point file
+	if (executableFiles.includes(fileName)) {
+		try {
+			// Make the file executable (chmod +x)
+			fs.chmodSync(filePath, 0o755) // rwxr-xr-x permissions
+			console.log(`Set executable permissions for ${filePath}`)
+		} catch (error) {
+			console.warn(`Warning: Could not set executable permissions for ${filePath}:`, error.message)
+		}
+	}
+}
+
+// After copying all files, recursively find and set permissions on all CLI entry point files
+console.log("Setting executable permissions on CLI entry point files...")
+function setPermissionsRecursively(directory) {
+	const files = fs.readdirSync(directory)
+
+	for (const file of files) {
+		const filePath = path.join(directory, file)
+		const stat = fs.statSync(filePath)
+
+		if (stat.isDirectory()) {
+			setPermissionsRecursively(filePath)
+		} else {
+			setExecutablePermissionsIfNeeded(filePath, file)
+		}
+	}
+}
+
+// Set permissions on all files in the CLI dist directory
+setPermissionsRecursively(cliDistDir)
 
 console.log("CLI preparation completed successfully.")

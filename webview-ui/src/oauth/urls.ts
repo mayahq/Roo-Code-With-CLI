@@ -1,5 +1,5 @@
 export function getCallbackUrl(provider: string, uriScheme?: string) {
-	const callbackUrl = `${uriScheme || "vscode"}://rooveterinaryinc.roo-cline-with-cli/${provider}`
+	const callbackUrl = `${uriScheme || "vscode"}://mayalabs.roo-cline-with-cli/${provider}`
 	return encodeURIComponent(callbackUrl)
 }
 

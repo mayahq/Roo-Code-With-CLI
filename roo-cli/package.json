@@ -9,9 +9,10 @@
 		"roo-config": "dist/ipc-bridge-cli/index.js"
 	},
 	"scripts": {
-		"build": "tsc",
+		"build": "tsc && chmod +x dist/cli.js dist/core/repl.js dist/ipc-bridge-cli/index.js",
 		"start": "node dist/cli.js",
-		"dev": "tsc --watch & node --watch dist/cli.js"
+		"dev": "tsc --watch & node --watch dist/cli.js",
+		"postinstall": "chmod +x dist/cli.js dist/core/repl.js dist/ipc-bridge-cli/index.js || true"
 	},
 	"keywords": [
 		"cli",

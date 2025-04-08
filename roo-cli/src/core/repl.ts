@@ -1,27 +1,68 @@
-// REPL (Read-Eval-Print Loop) for Roo CLI
-
+#!/usr/bin/env node
 import chalk from "chalk"
+import crypto from "crypto" // For generating UUIDs
 import fs from "fs/promises"
-import { marked, Renderer, Tokens } from "marked" // Import Renderer and Tokens types
+import { marked, Renderer, Tokens } from "marked"
 import { stdin as input, stdout as output } from "node:process"
 import * as readline from "node:readline/promises"
+import os from "os" // For home directory
 import path from "path"
 import { Agent } from "./agent.js"
 
-// Define a custom renderer object implementing the Renderer interface
-const customRenderer: Partial<Renderer> = {
-	// Note: 'this' context inside these functions refers to the renderer instance being used by marked.
+// --- State Management ---
 
-	code({ text, lang, escaped }: Tokens.Code): string {
-		// Updated to match the expected interface
-		if (lang) {
-			return `\n${chalk.cyan(text)}\n` // Add newlines for block spacing
+const CLI_STATE_DIR = path.join(os.homedir(), ".config", "roo")
+const CLI_STATE_FILE = path.join(CLI_STATE_DIR, "cli-state.json")
+const DEFAULT_MODE = "code" // Default mode when starting or creating a new task
+
+interface CliState {
+	currentTaskId: string
+}
+
+async function loadCliState(): Promise<CliState> {
+	try {
+		await fs.mkdir(CLI_STATE_DIR, { recursive: true })
+		const stateContent = await fs.readFile(CLI_STATE_FILE, "utf-8")
+		const state = JSON.parse(stateContent)
+		if (state.currentTaskId && typeof state.currentTaskId === "string") {
+			return state
 		}
-		return `\n${text}\n` // Add newlines for block spacing
-	},
+	} catch (error: unknown) {
+		// If file doesn't exist or is invalid, create a new state
+		if (error instanceof Error && (error as NodeJS.ErrnoException).code === "ENOENT") {
+			// File not found, expected on first run
+		} else {
+			console.warn(chalk.yellow(`Warning: Could not load CLI state from ${CLI_STATE_FILE}.`), error)
+		}
+	}
+	// Default state if loading fails or file doesn't exist
+	const newState = { currentTaskId: crypto.randomUUID() }
+	await saveCliState(newState)
+	return newState
+}
 
+async function saveCliState(state: CliState): Promise<void> {
+	try {
+		await fs.mkdir(CLI_STATE_DIR, { recursive: true })
+		await fs.writeFile(CLI_STATE_FILE, JSON.stringify(state, null, 2))
+	} catch (error) {
+		console.error(chalk.red(`Error: Could not save CLI state to ${CLI_STATE_FILE}.`), error)
+		// Continue execution, but state won't persist
+	}
+}
+
+// --- Marked Custom Renderer ---
+const customRenderer: Partial<Renderer> = {
+	text(token: Tokens.Text | Tokens.Escape | Tokens.Tag): string {
+		return token.text || token.raw || "" // Return the text content of the token
+	},
+	code({ text, lang }: Tokens.Code): string {
+		if (lang) {
+			return `\n${chalk.cyan(text)}\n`
+		}
+		return `\n${text}\n`
+	},
 	heading({ tokens, depth }: Tokens.Heading): string {
-		// Updated to match the expected interface
 		const text = marked.parseInline(tokens.map((t) => t.raw || "").join(""))
 		switch (depth) {
 			case 1:
@@ -34,175 +75,207 @@ const customRenderer: Partial<Renderer> = {
 				return chalk.bold(`\n${"#".repeat(depth)} ${text}\n`)
 		}
 	},
-
 	strong({ tokens }: Tokens.Strong): string {
-		// Updated to match the expected interface
 		const text = marked.parseInline(tokens.map((t) => t.raw || "").join(""))
 		return chalk.bold(text)
 	},
-
 	em({ tokens }: Tokens.Em): string {
-		// Updated to match the expected interface
 		const text = marked.parseInline(tokens.map((t) => t.raw || "").join(""))
 		return chalk.italic(text)
 	},
-
 	listitem(item: Tokens.ListItem): string {
-		// Updated to match the expected interface
 		const text = marked.parseInline(item.tokens.map((t: any) => t.raw || "").join(""))
 		const task = item.task || false
 		const checked = item.checked || false
-
 		const marker = task ? (checked ? "[x] " : "[ ] ") : "* "
-		// Avoid adding extra newline if text already ends with one (common for nested lists)
-		const textStr = String(text) // Ensure text is a string
+		const textStr = String(text)
 		return `${marker}${textStr}${textStr.endsWith("\n") ? "" : "\n"}`
 	},
-
 	link({ href, title, tokens }: Tokens.Link): string {
-		// Updated to match the expected interface
 		const text = marked.parseInline(tokens.map((t) => t.raw || "").join(""))
 		return chalk.underline.blue(`[${text}](${href})${title ? ` "${title}"` : ""}`)
 	},
-
 	paragraph({ tokens }: Tokens.Paragraph): string {
-		// Updated to match the expected interface
 		const text = marked.parseInline(tokens.map((t) => t.raw || "").join(""))
-		// Add extra line break after paragraphs for better spacing.
-		return text + "\n\n" // Add two newlines for spacing
+		return text + "\n\n"
 	},
 }
 
-// Configure marked with the custom renderer object
 marked.setOptions({
-	renderer: customRenderer as Renderer, // Cast to Renderer type
-	gfm: true, // Enable GitHub Flavored Markdown
+	renderer: customRenderer as Renderer,
+	gfm: true,
 })
+
+// --- Types ---
 
 interface ReplOptions {
 	skipConfirmation?: boolean
 }
 
-// Basic command structure
-interface ParsedCommand {
-	command: string | null
-	task: string
-	mentionedFiles: string[] // Store raw mentions for now
-	resolvedFiles: string[] // Store absolute paths
+// Updated command structure
+interface ParsedInput {
+	isReplCommand: boolean // Is it a command handled by the REPL itself?
+	command: string | null // e.g., 'code', 'ask', 'new', 'help', 'exit'
+	task: string // The actual text prompt for the agent
+	mentionedFiles: string[] // Raw file mentions
+	resolvedFiles: string[] // Absolute paths of existing mentioned files
 }
 
-// Regex to parse commands like /code, /ask
-const commandRegex = /^\/(\w+)\s*(.*)$/
-// Regex to find @mentions like @path/to/file.ts or @../relative/path.js
-const mentionRegex = /@([\w./\\-]+)/g
+// --- Parsing Logic ---
 
-async function parseInput(input: string): Promise<ParsedCommand> {
-	console.log(`[DEBUG] Parsing input: "${input}"`) // Debug log
+const commandRegex = /^\/(\w+)\s*(.*)$/
+const mentionRegex = /@([\w./\\-]+)/g
+const validModes = ["code", "ask", "architect", "debug"] // Add other valid modes as needed
+
+async function parseInput(input: string): Promise<ParsedInput> {
 	const commandMatch = input.match(commandRegex)
 	let command: string | null = null
-	let task = input // Default to the whole input if no command found
+	let task = input
+	let isReplCommand = false
 
 	if (commandMatch) {
-		command = commandMatch[1].toLowerCase()
-		task = commandMatch[2].trim()
+		const potentialCommand = commandMatch[1].toLowerCase()
+		// Check if it's a REPL command or a mode command
+		if (["help", "exit", "new", ...validModes].includes(potentialCommand)) {
+			command = potentialCommand
+			task = commandMatch[2].trim() // Task is the rest for mode commands
+			if (["help", "exit", "new"].includes(command)) {
+				isReplCommand = true
+				task = "" // These commands don't have a task part for the agent
+			}
+		} else {
+			// It's not a recognized REPL/mode command, treat as implicit task
+			// Keep command null, task remains the full input
+		}
+	} else if (input.startsWith("/")) {
+		// It starts with / but doesn't match the regex structure, treat as implicit task
+		command = null
+		task = input
 	}
 
+	// Handle mentions (unchanged, but applied to the original input)
 	const mentionedFiles: string[] = []
 	const resolvedFiles: string[] = []
 	let mentionMatch
-
-	// Find all @mentions in the original input string
-	const fullInput = input // Keep original input for mention extraction
-	while ((mentionMatch = mentionRegex.exec(fullInput)) !== null) {
+	while ((mentionMatch = mentionRegex.exec(input)) !== null) {
 		const filePath = mentionMatch[1]
 		mentionedFiles.push(filePath)
-		const absolutePath = path.resolve(process.cwd(), filePath) // Resolve relative to CWD
+		const absolutePath = path.resolve(process.cwd(), filePath)
 		try {
-			// Check if the file exists before adding
 			await fs.access(absolutePath)
 			resolvedFiles.push(absolutePath)
 		} catch (error) {
 			console.warn(chalk.yellow(`Warning: Mentioned file not found or inaccessible: ${filePath}`))
-			// Optionally, decide whether to still pass the mention or filter it out
 		}
 	}
 
-	// If no command was explicitly given (like /code), treat the whole input as the task
-	// unless it's a special command like /exit or /help
-	if (command === null && task.toLowerCase() !== "/exit" && task.toLowerCase() !== "/help") {
-		// The task is already the full input, no change needed here
-		// But we need to ensure the agent handles this case
-	} else if (command === "exit" || command === "help") {
-		// These commands are handled directly in the loop
-	} else if (command === null && (task.toLowerCase() === "/exit" || task.toLowerCase() === "/help")) {
-		// User typed '/exit' or '/help' without a leading space, handle it
-		command = task.toLowerCase().substring(1) // Extract 'exit' or 'help'
-		task = "" // No task description in this case
-	}
+	// If a mode command was parsed, the 'task' is the text following it.
+	// If no command was parsed, the 'task' is the entire input.
+	// If a REPL command (/help, /exit, /new) was parsed, 'task' is empty.
 
-	console.log(`[DEBUG] Parsed result: command=${command}, task=${task}, files=${resolvedFiles.length}`) // Debug log
-	return { command, task, mentionedFiles, resolvedFiles }
+	console.log(
+		`[DEBUG] Parsed: command=${command}, isReplCmd=${isReplCommand}, task=${task}, files=${resolvedFiles.length}`,
+	)
+	return { command, isReplCommand, task, mentionedFiles, resolvedFiles }
 }
+
+// --- REPL Function ---
 
 export async function startRepl(options: ReplOptions = {}) {
 	const { skipConfirmation = false } = options
 	const rl = readline.createInterface({ input, output })
-	const agent = new Agent({ skipConfirmation }) // Instantiate the agent
+	const agent = new Agent({ skipConfirmation }) // Agent handles LLM calls
 
-	console.log("Welcome to Roo CLI! Type /help for commands, /exit to quit.")
+	let cliState = await loadCliState()
+	let currentMode = DEFAULT_MODE // Initialize mode
+
+	console.log(chalk.blue("Welcome to Roo CLI!"))
+	console.log(chalk.gray(`Current Task ID: ${cliState.currentTaskId}`))
+	console.log(chalk.gray(`Current Mode: /${currentMode}`))
+	console.log(chalk.gray("Type /help for commands, /exit to quit."))
 
 	while (true) {
-		const answer = await rl.question(chalk.gray("> ")) // Use chalk for prompt
+		const prompt = chalk.gray(`(${currentMode}) > `)
+		const answer = await rl.question(prompt)
 		const trimmedAnswer = answer.trim()
 
-		if (trimmedAnswer.toLowerCase() === "/exit") {
-			console.log("Goodbye!")
-			break
-		}
-
-		if (trimmedAnswer === "") continue // Ignore empty input
+		if (trimmedAnswer === "") continue
 
 		const parsed = await parseInput(trimmedAnswer)
 
-		if (parsed.command === "help") {
-			// Use the custom renderer for help text
-			const helpText = `
-Available commands:
-*   \`/code <task description> [@file ...]\` - Ask Roo to perform a coding task.
-*   \`/ask <question> [@file ...]\` - Ask Roo a question.
+		// Handle REPL-specific commands first
+		if (parsed.isReplCommand) {
+			switch (parsed.command) {
+				case "exit":
+					console.log("Goodbye!")
+					rl.close()
+					return // Exit the function
+				case "help":
+					const helpText = `
+**Available Commands:**
+*   \`/<mode> <task description> [@file ...]\` - Start or continue a task in the specified mode.
+    *   Available modes: \`/code\`, \`/ask\`, \`/architect\`, \`/debug\`
+*   \`/new\` - Start a new task session (clears context).
 *   \`/help\` - Show this help message.
 *   \`/exit\` - Exit the CLI.
 
 Use \`@path/to/file\` to mention files relevant to your task/question.
+If no command is used, the input is treated as a task for the current mode (\`/${currentMode}\`).
 `
-			// Use marked.parse() which now correctly uses the custom renderer
-			console.log(await marked.parse(helpText))
-			continue
+					console.log(await marked.parse(helpText))
+					continue // Go to next loop iteration
+				case "new":
+					cliState.currentTaskId = crypto.randomUUID()
+					currentMode = DEFAULT_MODE // Reset mode for new task
+					await saveCliState(cliState)
+					// agent.clearHistory() // Agent does not have this method; state is managed by taskId
+					console.log(chalk.green(`Started new task session.`))
+					console.log(chalk.gray(`New Task ID: ${cliState.currentTaskId}`))
+					console.log(chalk.gray(`Current Mode: /${currentMode}`))
+					continue // Go to next loop iteration
+			}
 		}
 
-		// Now, call the agent for any command that isn't 'exit' or 'help'
-		// This includes null commands (implicit task) and specific commands like /code, /ask
-		if (parsed.command !== "exit") {
+		// Handle mode switching or agent processing
+		if (parsed.command && validModes.includes(parsed.command)) {
+			// Mode switch command
+			currentMode = parsed.command
+			console.log(chalk.gray(`Switched to mode: /${currentMode}`))
+			// If there's a task description after the mode command, process it immediately
+			if (parsed.task) {
+				try {
+					console.log(chalk.blue("Roo is thinking..."))
+					const agentResponse = await agent.processCommand(
+						// cliState.currentTaskId, // Agent doesn't take taskId directly
+						currentMode, // Pass the selected mode
+						parsed.task,
+						parsed.resolvedFiles,
+					)
+					const formattedOutput = (await marked.parse(agentResponse.outputMarkdown)).trim()
+					console.log(formattedOutput)
+				} catch (error) {
+					console.error(chalk.red(`Agent error: ${error}`))
+				}
+			}
+			// If no task description, just switching mode, continue to next prompt
+		} else {
+			// Implicit task for the current mode, or explicit task after mode switch handled above
 			try {
-				console.log(chalk.blue("Roo is thinking...")) // Indicate processing
-				// Pass the parsed command and task to the agent
+				console.log(chalk.blue("Roo is thinking..."))
+				// Pass currentMode if no specific mode command was given
+				const modeToUse = parsed.command && validModes.includes(parsed.command) ? parsed.command : currentMode
 				const agentResponse = await agent.processCommand(
-					parsed.command, // Pass the command type ('code', 'ask', or null)
-					parsed.task,
+					// cliState.currentTaskId, // Agent doesn't take taskId directly
+					modeToUse, // Use current mode
+					parsed.task, // Task is the full input if no command, or text after mode command
 					parsed.resolvedFiles,
 				)
-				// Render the Markdown output using the custom renderer
-				// Trim the result to remove potential leading/trailing whitespace from parsing
 				const formattedOutput = (await marked.parse(agentResponse.outputMarkdown)).trim()
-				console.log(formattedOutput) // Output formatted markdown
+				console.log(formattedOutput)
 			} catch (error) {
 				console.error(chalk.red(`Agent error: ${error}`))
-				console.log(`[DEBUG] Caught error during agent processing.`) // Debug log
 			}
-		} else {
-			console.log(`[DEBUG] Command was 'exit', skipping agent call.`) // Debug log
 		}
 	}
-
-	rl.close()
+	// rl.close() // Already closed in /exit case
 }

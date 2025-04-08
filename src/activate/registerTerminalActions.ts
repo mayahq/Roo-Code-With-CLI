@@ -1,14 +1,14 @@
 import * as vscode from "vscode"
 import { ClineProvider } from "../core/webview/ClineProvider"
-import { Terminal } from "../integrations/terminal/Terminal"
 import { t } from "../i18n"
+import { Terminal } from "../integrations/terminal/Terminal"
 
 const TERMINAL_COMMAND_IDS = {
-	ADD_TO_CONTEXT: "roo-cline.terminalAddToContext",
-	FIX: "roo-cline.terminalFixCommand",
-	FIX_IN_CURRENT_TASK: "roo-cline.terminalFixCommandInCurrentTask",
-	EXPLAIN: "roo-cline.terminalExplainCommand",
-	EXPLAIN_IN_CURRENT_TASK: "roo-cline.terminalExplainCommandInCurrentTask",
+	ADD_TO_CONTEXT: "roo-cline-with-cli.terminalAddToContext",
+	FIX: "roo-cline-with-cli.terminalFixCommand",
+	FIX_IN_CURRENT_TASK: "roo-cline-with-cli.terminalFixCommandInCurrentTask",
+	EXPLAIN: "roo-cline-with-cli.terminalExplainCommand",
+	EXPLAIN_IN_CURRENT_TASK: "roo-cline-with-cli.terminalExplainCommandInCurrentTask",
 } as const
 
 export const registerTerminalActions = (context: vscode.ExtensionContext) => {

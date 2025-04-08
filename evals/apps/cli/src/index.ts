@@ -1,37 +1,37 @@
 import * as fs from "fs"
-import * as path from "path"
 import * as os from "os"
+import * as path from "path"
 
-import pMap from "p-map"
-import pWaitFor from "p-wait-for"
 import { execa, parseCommandString } from "execa"
 import { build, filesystem, GluegunPrompt, GluegunToolbox } from "gluegun"
+import pMap from "p-map"
+import pWaitFor from "p-wait-for"
 
+import {
+	type Run,
+	type Task,
+	createRun,
+	createTask,
+	createTaskMetrics,
+	findRun,
+	finishRun,
+	getTasks,
+	updateTask,
+	updateTaskMetrics,
+} from "@evals/db"
+import { IpcClient, IpcServer } from "@evals/ipc"
 import {
 	type ExerciseLanguage,
 	exerciseLanguages,
-	RooCodeEventName,
-	IpcOrigin,
 	IpcMessageType,
-	TaskCommandName,
+	IpcOrigin,
 	rooCodeDefaults,
+	RooCodeEventName,
+	TaskCommandName,
 } from "@evals/types"
-import {
-	type Run,
-	findRun,
-	createRun,
-	finishRun,
-	type Task,
-	createTask,
-	getTasks,
-	updateTask,
-	createTaskMetrics,
-	updateTaskMetrics,
-} from "@evals/db"
-import { IpcServer, IpcClient } from "@evals/ipc"
 
-import { __dirname, extensionDevelopmentPath, exercisesPath } from "./paths.js"
 import { getExercises } from "./exercises.js"
+import { __dirname, exercisesPath, extensionDevelopmentPath } from "./paths.js"
 
 type TaskResult = { success: boolean; retry: boolean }
 type TaskPromise = Promise<TaskResult>
@@ -97,7 +97,7 @@ const run = async (toolbox: GluegunToolbox) => {
 		throw new Error("No tasks found.")
 	}
 
-	console.log(await execa({ cwd: exercisesPath })`git config user.name "Roo Code"`)
+	console.log(await execa({ cwd: exercisesPath })`git config user.name "Roo Code With CLI"`)
 	console.log(await execa({ cwd: exercisesPath })`git config user.email "support@roocode.com"`)
 	console.log(await execa({ cwd: exercisesPath })`git checkout -f`)
 	console.log(await execa({ cwd: exercisesPath })`git clean -fd`)

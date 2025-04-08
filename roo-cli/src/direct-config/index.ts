@@ -33,7 +33,7 @@ const getPossibleVSCodePaths = (): string[] => {
 					variant,
 					"User",
 					"globalStorage",
-					"rooveterinaryinc.roo-cline",
+					"rooveterinaryinc.roo-cline-with-cli",
 				),
 			)
 		}
@@ -48,14 +48,16 @@ const getPossibleVSCodePaths = (): string[] => {
 					variant,
 					"User",
 					"globalStorage",
-					"rooveterinaryinc.roo-cline",
+					"rooveterinaryinc.roo-cline-with-cli",
 				),
 			)
 		}
 	} else {
 		// Linux and others
 		for (const variant of VS_CODE_VARIANTS) {
-			paths.push(path.join(homeDir, ".config", variant, "User", "globalStorage", "rooveterinaryinc.roo-cline"))
+			paths.push(
+				path.join(homeDir, ".config", variant, "User", "globalStorage", "rooveterinaryinc.roo-cline-with-cli"),
+			)
 		}
 	}
 
@@ -79,7 +81,7 @@ const getPossibleSecretsPaths = (): string[] => {
 					variant,
 					"User",
 					"secrets",
-					"rooveterinaryinc.roo-cline",
+					"rooveterinaryinc.roo-cline-with-cli",
 				),
 			)
 		}
@@ -87,13 +89,21 @@ const getPossibleSecretsPaths = (): string[] => {
 		// Windows
 		for (const variant of VS_CODE_VARIANTS) {
 			paths.push(
-				path.join(homeDir, "AppData", "Roaming", variant, "User", "secrets", "rooveterinaryinc.roo-cline"),
+				path.join(
+					homeDir,
+					"AppData",
+					"Roaming",
+					variant,
+					"User",
+					"secrets",
+					"rooveterinaryinc.roo-cline-with-cli",
+				),
 			)
 		}
 	} else {
 		// Linux and others
 		for (const variant of VS_CODE_VARIANTS) {
-			paths.push(path.join(homeDir, ".config", variant, "User", "secrets", "rooveterinaryinc.roo-cline"))
+			paths.push(path.join(homeDir, ".config", variant, "User", "secrets", "rooveterinaryinc.roo-cline-with-cli"))
 		}
 	}
 
@@ -150,7 +160,7 @@ const loadProviderProfiles = async (): Promise<any> => {
 		if (!secretsPath) {
 			console.error(`VS Code secrets directory not found. Tried:`)
 			secretsPaths.forEach((p) => console.error(`  - ${p}`))
-			console.error("Make sure Roo Code extension is installed and has been used at least once.")
+			console.error("Make sure Roo Code With CLI extension is installed and has been used at least once.")
 			console.error("If you're using a different VS Code variant, please report this issue.")
 
 			// Ask if the user wants to create a default configuration
@@ -205,7 +215,7 @@ const loadProviderProfiles = async (): Promise<any> => {
 
 		if (!configFile) {
 			console.error(`Configuration not found in VS Code secrets storage at ${secretsPath}.`)
-			console.error("Make sure Roo Code extension is installed and has been used at least once.")
+			console.error("Make sure Roo Code With CLI extension is installed and has been used at least once.")
 			process.exit(1)
 		}
 
@@ -231,7 +241,7 @@ const saveProviderProfiles = (providerProfiles: any): void => {
 		if (!secretsPath) {
 			console.error(`VS Code secrets directory not found. Tried:`)
 			secretsPaths.forEach((p) => console.error(`  - ${p}`))
-			console.error("Make sure Roo Code extension is installed and has been used at least once.")
+			console.error("Make sure Roo Code With CLI extension is installed and has been used at least once.")
 			process.exit(1)
 		}
 
@@ -257,7 +267,7 @@ const saveProviderProfiles = (providerProfiles: any): void => {
 
 		if (!configFile) {
 			console.error(`Configuration not found in VS Code secrets storage at ${secretsPath}.`)
-			console.error("Make sure Roo Code extension is installed and has been used at least once.")
+			console.error("Make sure Roo Code With CLI extension is installed and has been used at least once.")
 			process.exit(1)
 		}
 

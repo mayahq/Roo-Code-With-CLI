@@ -162,7 +162,7 @@ The CLI tool can be configured using:
 
 If you encounter issues:
 
-1. Make sure VS Code is running with the Roo Code extension active.
+1. Make sure VS Code is running with the Roo Code With CLI extension active.
 2. Check that the bridge is enabled in VS Code settings.
 3. Verify that the IPC socket exists in the temporary directory.
 4. Check the VS Code output panel for error messages.

@@ -1,11 +1,11 @@
 // npx jest src/api/providers/__tests__/openrouter.test.ts
 
-import axios from "axios"
 import { Anthropic } from "@anthropic-ai/sdk"
+import axios from "axios"
 import OpenAI from "openai"
 
-import { OpenRouterHandler } from "../openrouter"
 import { ApiHandlerOptions, ModelInfo } from "../../../shared/api"
+import { OpenRouterHandler } from "../openrouter"
 
 // Mock dependencies
 jest.mock("openai")
@@ -39,7 +39,7 @@ describe("OpenRouterHandler", () => {
 			apiKey: mockOptions.openRouterApiKey,
 			defaultHeaders: {
 				"HTTP-Referer": "https://github.com/RooVetGit/Roo-Cline",
-				"X-Title": "Roo Code",
+				"X-Title": "Roo Code With CLI",
 			},
 		})
 	})

@@ -1,11 +1,10 @@
 // src/integrations/terminal/__tests__/TerminalProcessExec.pwsh.test.ts
 import * as vscode from "vscode"
-import { TerminalProcess, ExitCodeDetails } from "../TerminalProcess"
 import { Terminal } from "../Terminal"
+import { ExitCodeDetails, TerminalProcess } from "../TerminalProcess"
 import { TerminalRegistry } from "../TerminalRegistry"
+import { createPowerShellMockStream, isPowerShellCoreAvailable } from "./streamUtils"
 import { createPowerShellStream } from "./streamUtils/pwshStream"
-import { createPowerShellMockStream } from "./streamUtils"
-import { isPowerShellCoreAvailable } from "./streamUtils"
 
 // Skip this test if PowerShell Core is not available
 const hasPwsh = isPowerShellCoreAvailable()
@@ -74,7 +73,7 @@ async function testPowerShellCommand(
 			executeCommand: jest.fn(),
 			cwd: vscode.Uri.file("/test/path"),
 		},
-		name: "Roo Code",
+		name: "Roo Code With CLI",
 		processId: Promise.resolve(123),
 		creationOptions: {},
 		exitStatus: undefined,
@@ -219,7 +218,7 @@ async function testPowerShellCommand(
 }
 
 // Import the test purposes from the common file
-import { TEST_PURPOSES, LARGE_OUTPUT_PARAMS, TEST_TEXT } from "./TerminalProcessExec.common"
+import { LARGE_OUTPUT_PARAMS, TEST_PURPOSES, TEST_TEXT } from "./TerminalProcessExec.common"
 
 describePlatform("TerminalProcess with PowerShell Command Output", () => {
 	beforeAll(() => {

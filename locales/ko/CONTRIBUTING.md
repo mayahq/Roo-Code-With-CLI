@@ -1,6 +1,6 @@
-# Roo Code에 기여하기
+# Roo Code With CLI에 기여하기
 
-Roo Code에 기여하는 데 관심을 가져주셔서 기쁩니다. 버그를 수정하든, 기능을 추가하든, 문서를 개선하든, 모든 기여는 Roo Code를 더 스마트하게 만듭니다! 우리 커뮤니티를 활기차고 친절하게 유지하기 위해, 모든 구성원은 우리의 [행동 강령](CODE_OF_CONDUCT.md)을 준수해야 합니다.
+Roo Code With CLI에 기여하는 데 관심을 가져주셔서 기쁩니다. 버그를 수정하든, 기능을 추가하든, 문서를 개선하든, 모든 기여는 Roo Code With CLI를 더 스마트하게 만듭니다! 우리 커뮤니티를 활기차고 친절하게 유지하기 위해, 모든 구성원은 우리의 [행동 강령](CODE_OF_CONDUCT.md)을 준수해야 합니다.
 
 ## 우리 커뮤니티에 참여하세요
 
@@ -9,12 +9,12 @@ Roo Code에 기여하는 데 관심을 가져주셔서 기쁩니다. 버그를 �
 - 기여에 대한 실시간 도움과 지침 얻기
 - 다른 기여자 및 핵심 팀원과 연결
 - 프로젝트 개발 및 우선순위에 대한 최신 정보 유지
-- Roo Code의 미래를 형성하는 토론에 참여
+- Roo Code With CLI의 미래를 형성하는 토론에 참여
 - 다른 개발자와의 협업 기회 찾기
 
 ## 버그 또는 이슈 보고하기
 
-버그 보고는 모두를 위해 Roo Code를 더 좋게 만드는 데 도움이 됩니다! 새 이슈를 만들기 전에, 중복을 피하기 위해 [기존 이슈 검색](https://github.com/RooVetGit/Roo-Code/issues)을 해주세요. 버그를 보고할 준비가 되면, 관련 정보를 작성하는 데 도움이 되는 템플릿이 있는 [이슈 페이지](https://github.com/RooVetGit/Roo-Code/issues/new/choose)로 이동하세요.
+버그 보고는 모두를 위해 Roo Code With CLI를 더 좋게 만드는 데 도움이 됩니다! 새 이슈를 만들기 전에, 중복을 피하기 위해 [기존 이슈 검색](https://github.com/RooVetGit/Roo-Code/issues)을 해주세요. 버그를 보고할 준비가 되면, 관련 정보를 작성하는 데 도움이 되는 템플릿이 있는 [이슈 페이지](https://github.com/RooVetGit/Roo-Code/issues/new/choose)로 이동하세요.
 
 <blockquote class='warning-note'>
      🔐 <b>중요:</b> 보안 취약점을 발견한 경우, <a href="https://github.com/RooVetGit/Roo-Code/security/advisories/new">비공개로 보고하기 위해 Github 보안 도구를 사용하세요</a>.
@@ -22,16 +22,16 @@ Roo Code에 기여하는 데 관심을 가져주셔서 기쁩니다. 버그를 �
 
 ## 작업할 내용 결정하기
 
-첫 기여를 위한 좋은 시작점을 찾고 계신가요? 우리의 [Roo Code 이슈](https://github.com/orgs/RooVetGit/projects/1) Github 프로젝트의 "Issue [Unassigned]" 섹션에서 이슈를 확인하세요. 이러한 이슈들은 새로운 기여자와 우리가 도움을 필요로 하는 영역을 위해 특별히 선별되었습니다!
+첫 기여를 위한 좋은 시작점을 찾고 계신가요? 우리의 [Roo Code With CLI 이슈](https://github.com/orgs/RooVetGit/projects/1) Github 프로젝트의 "Issue [Unassigned]" 섹션에서 이슈를 확인하세요. 이러한 이슈들은 새로운 기여자와 우리가 도움을 필요로 하는 영역을 위해 특별히 선별되었습니다!
 
-우리는 [문서](https://docs.roocode.com/)에 대한 기여도 환영합니다! 오타 수정, 기존 가이드 개선 또는 새로운 교육 콘텐츠 생성 등 - 모든 사람이 Roo Code를 최대한 활용할 수 있도록 도와주는 커뮤니티 기반 리소스 저장소를 구축하고 싶습니다. 모든
+우리는 [문서](https://docs.roocode.com/)에 대한 기여도 환영합니다! 오타 수정, 기존 가이드 개선 또는 새로운 교육 콘텐츠 생성 등 - 모든 사람이 Roo Code With CLI를 최대한 활용할 수 있도록 도와주는 커뮤니티 기반 리소스 저장소를 구축하고 싶습니다. 모든
 페이지에서 "Edit this page"를 클릭하여 파일을 편집할 수 있는 Github의 적절한 위치로 빠르게 이동하거나, https://github.com/RooVetGit/Roo-Code-Docs에 직접 접근할 수 있습니다.
 
-더 큰 기능 작업을 계획하고 있다면, Roo Code의 비전과 일치하는지 논의할 수 있도록 먼저 [기능 요청](https://github.com/RooVetGit/Roo-Code/discussions/categories/feature-requests?discussions_q=is%3Aopen+category%3A%22Feature+Requests%22+sort%3Atop)을 생성해주세요. 또한 아이디어가 우리의 전략적 방향과 일치하는지 확인하기 위해 아래의 [프로젝트 로드맵](#프로젝트-로드맵)을 확인할 수도 있습니다.
+더 큰 기능 작업을 계획하고 있다면, Roo Code With CLI의 비전과 일치하는지 논의할 수 있도록 먼저 [기능 요청](https://github.com/RooVetGit/Roo-Code/discussions/categories/feature-requests?discussions_q=is%3Aopen+category%3A%22Feature+Requests%22+sort%3Atop)을 생성해주세요. 또한 아이디어가 우리의 전략적 방향과 일치하는지 확인하기 위해 아래의 [프로젝트 로드맵](#프로젝트-로드맵)을 확인할 수도 있습니다.
 
 ## 프로젝트 로드맵
 
-Roo Code는 우리의 우선순위와 미래 방향을 안내하는 명확한 개발 로드맵을 가지고 있습니다. 우리의 로드맵을 이해하면 다음과 같은 도움을 받을 수 있습니다:
+Roo Code With CLI는 우리의 우선순위와 미래 방향을 안내하는 명확한 개발 로드맵을 가지고 있습니다. 우리의 로드맵을 이해하면 다음과 같은 도움을 받을 수 있습니다:
 
 - 프로젝트 목표에 맞게 기여 조정
 - 당신의 전문 지식이 가장 가치 있는 영역 식별
@@ -83,10 +83,10 @@ Roo가 모든 사람의 컴퓨터에서 잘 작동하기를 원합니다:
 
 Roo가 모든 사람의 언어를 말하기를 원합니다:
 
-- 我们希望 Roo Code 说每个人的语言
-- Queremos que Roo Code hable el idioma de todos
-- हम चाहते हैं कि Roo Code हर किसी की भाषा बोले
-- نريد أن يتحدث Roo Code لغة الجميع
+- 我们希望 Roo Code With CLI 说每个人的语言
+- Queremos que Roo Code With CLI hable el idioma de todos
+- हम चाहते हैं कि Roo Code With CLI हर किसी की भाषा बोले
+- نريد أن يتحدث Roo Code With CLI لغة الجميع
 
 우리는 특히 로드맵 목표를 발전시키는 기여를 환영합니다. 이러한 기둥에 맞는 작업을 하고 있다면, PR 설명에서 이를 언급해 주세요.
 
@@ -111,7 +111,7 @@ npm run dev
 ```
 
 4. **디버깅**:
-   VSCode에서 `F5`를 누르거나(**실행** → **디버깅 시작**) Roo Code가 로드된 새 세션을 엽니다.
+   VSCode에서 `F5`를 누르거나(**실행** → **디버깅 시작**) Roo Code With CLI가 로드된 새 세션을 엽니다.
 
 웹뷰의 변경 사항은 즉시 나타납니다. 코어 확장에 대한 변경 사항은 확장 호스트를 다시 시작해야 합니다.
 
@@ -124,12 +124,12 @@ npm run build
 `bin/` 디렉토리에 `.vsix` 파일이 나타나며 다음 명령으로 설치할 수 있습니다:
 
 ```sh
-code --install-extension bin/roo-cline-<version>.vsix
+code --install-extension bin/roo-cline-with-cli-<version>.vsix
 ```
 
 ## 코드 작성 및 제출
 
-누구나 Roo Code에 코드를 기여할 수 있지만, 기여가 원활하게 통합될 수 있도록 다음 지침을 따라주시기 바랍니다:
+누구나 Roo Code With CLI에 코드를 기여할 수 있지만, 기여가 원활하게 통합될 수 있도록 다음 지침을 따라주시기 바랍니다:
 
 1. **Pull Request 집중**
 

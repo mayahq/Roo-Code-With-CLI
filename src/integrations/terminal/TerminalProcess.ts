@@ -69,7 +69,7 @@
 	Contact me if you have any questions:
 		- GitHub: KJ7LNW
 		- Discord: kj7lnw
-		- [roo-cline at z.ewheeler.org]
+		- [roo-cline-with-cli at z.ewheeler.org]
 
 	Cheers,
 		-Eric, KJ7LNW
@@ -85,8 +85,10 @@
 
 import { EventEmitter } from "events"
 import stripAnsi from "strip-ansi"
-import * as vscode from "vscode"
 import { inspect } from "util"
+import * as vscode from "vscode"
+import { Terminal } from "./Terminal"
+import { TerminalRegistry } from "./TerminalRegistry"
 
 export interface ExitCodeDetails {
 	exitCode: number | undefined
@@ -94,8 +96,6 @@ export interface ExitCodeDetails {
 	signalName?: string
 	coreDumpPossible?: boolean
 }
-import { Terminal } from "./Terminal"
-import { TerminalRegistry } from "./TerminalRegistry"
 
 export interface TerminalProcessEvents {
 	line: [line: string]

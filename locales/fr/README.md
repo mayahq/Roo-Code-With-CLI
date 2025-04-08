@@ -12,7 +12,7 @@
 </div>
 <br>
 <div align="center">
-  <h2>Rejoignez la communauté Roo Code</h2>
+  <h2>Rejoignez la communauté Roo Code With CLI</h2>
   <p>Connectez-vous avec des développeurs, contribuez avec vos idées et restez à jour avec les derniers outils de programmation propulsés par l'IA.</p>
   
   <a href="https://discord.gg/roocode" target="_blank"><img src="https://img.shields.io/badge/Rejoindre%20Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Rejoindre Discord"></a>
@@ -23,16 +23,16 @@
 <br>
 
 <div align="center">
-<h1>Roo Code (anciennement Roo Cline)</h1>
+<h1>Roo Code With CLI (anciennement Roo Cline)</h1>
 
-<a href="https://marketplace.visualstudio.com/items?itemName=RooVeterinaryInc.roo-cline" target="_blank"><img src="https://img.shields.io/badge/T%C3%A9l%C3%A9charger%20sur%20VS%20Marketplace-blue?style=for-the-badge&logo=visualstudiocode&logoColor=white" alt="Télécharger sur VS Marketplace"></a>
+<a href="https://marketplace.visualstudio.com/items?itemName=RooVeterinaryInc.roo-cline-with-cli" target="_blank"><img src="https://img.shields.io/badge/T%C3%A9l%C3%A9charger%20sur%20VS%20Marketplace-blue?style=for-the-badge&logo=visualstudiocode&logoColor=white" alt="Télécharger sur VS Marketplace"></a>
 <a href="https://github.com/RooVetGit/Roo-Code/discussions/categories/feature-requests?discussions_q=is%3Aopen+category%3A%22Feature+Requests%22+sort%3Atop" target="_blank"><img src="https://img.shields.io/badge/Demandes%20de%20fonctionnalit%C3%A9s-yellow?style=for-the-badge" alt="Demandes de fonctionnalités"></a>
-<a href="https://marketplace.visualstudio.com/items?itemName=RooVeterinaryInc.roo-cline&ssr=false#review-details" target="_blank"><img src="https://img.shields.io/badge/%C3%89valuer%20%26%20Commenter-green?style=for-the-badge" alt="Évaluer & Commenter"></a>
+<a href="https://marketplace.visualstudio.com/items?itemName=RooVeterinaryInc.roo-cline-with-cli&ssr=false#review-details" target="_blank"><img src="https://img.shields.io/badge/%C3%89valuer%20%26%20Commenter-green?style=for-the-badge" alt="Évaluer & Commenter"></a>
 <a href="https://docs.roocode.com" target="_blank"><img src="https://img.shields.io/badge/Documentation-6B46C1?style=for-the-badge&logo=readthedocs&logoColor=white" alt="Documentation"></a>
 
 </div>
 
-**Roo Code** est un **agent de programmation autonome** propulsé par l'IA, au cœur de votre éditeur. Il peut :
+**Roo Code With CLI** est un **agent de programmation autonome** propulsé par l'IA, au cœur de votre éditeur. Il peut :
 
 - Communiquer en langage naturel
 - Lire et écrire des fichiers directement dans votre espace de travail
@@ -41,15 +41,15 @@
 - S'intégrer avec n'importe quelle modèle/API compatible OpenAI
 - Adapter sa "personnalité" et ses capacités grâce aux **Modes Personnalisés**
 
-Que vous recherchiez un partenaire de codage flexible, un architecte système, ou des rôles spécialisés comme un ingénieur QA ou un chef de produit, Roo Code peut vous aider à développer des logiciels plus efficacement.
+Que vous recherchiez un partenaire de codage flexible, un architecte système, ou des rôles spécialisés comme un ingénieur QA ou un chef de produit, Roo Code With CLI peut vous aider à développer des logiciels plus efficacement.
 
 Consultez le [CHANGELOG](../CHANGELOG.md) pour des mises à jour détaillées et des corrections.
 
 ---
 
-## 🎉 Roo Code 3.11 est sorti
+## 🎉 Roo Code With CLI 3.11 est sorti
 
-Roo Code 3.11 apporte des améliorations significatives de performance et de nouvelles fonctionnalités !
+Roo Code With CLI 3.11 apporte des améliorations significatives de performance et de nouvelles fonctionnalités !
 
 - Éditions rapides - Les modifications s'appliquent maintenant beaucoup plus vite. Moins d'attente, plus de codage.
 - Soldes des clés API - Visualisez vos soldes OpenRouter et Requesty dans les paramètres.
@@ -59,7 +59,7 @@ Roo Code 3.11 apporte des améliorations significatives de performance et de nou
 
 ---
 
-## Que peut faire Roo Code ?
+## Que peut faire Roo Code With CLI ?
 
 - 🚀 **Générer du code** à partir de descriptions en langage naturel
 - 🔧 **Refactoriser et déboguer** du code
@@ -70,7 +70,7 @@ Roo Code 3.11 apporte des améliorations significatives de performance et de nou
 
 ## Démarrage rapide
 
-1. [Installer Roo Code](https://docs.roocode.com/getting-started/installing)
+1. [Installer Roo Code With CLI](https://docs.roocode.com/getting-started/installing)
 2. [Connecter votre fournisseur d'IA](https://docs.roocode.com/getting-started/connecting-api-provider)
 3. [Essayer votre première tâche](https://docs.roocode.com/getting-started/your-first-task)
 
@@ -78,7 +78,7 @@ Roo Code 3.11 apporte des améliorations significatives de performance et de nou
 
 ### Modes multiples
 
-Roo Code s'adapte à vos besoins avec des [modes](https://docs.roocode.com/basic-usage/using-modes) spécialisés :
+Roo Code With CLI s'adapte à vos besoins avec des [modes](https://docs.roocode.com/basic-usage/using-modes) spécialisés :
 
 - **Mode Code :** Pour les tâches de programmation générales
 - **Mode Architecte :** Pour la planification et le leadership technique
@@ -88,18 +88,18 @@ Roo Code s'adapte à vos besoins avec des [modes](https://docs.roocode.com/basic
 
 ### Outils intelligents
 
-Roo Code est livré avec des [outils](https://docs.roocode.com/basic-usage/how-tools-work) puissants qui peuvent :
+Roo Code With CLI est livré avec des [outils](https://docs.roocode.com/basic-usage/how-tools-work) puissants qui peuvent :
 
 - Lire et écrire des fichiers dans votre projet
 - Exécuter des commandes dans votre terminal VS Code
 - Contrôler un navigateur web
 - Utiliser des outils externes via [MCP (Model Context Protocol)](https://docs.roocode.com/advanced-usage/mcp)
 
-MCP étend les capacités de Roo Code en vous permettant d'ajouter un nombre illimité d'outils personnalisés. Intégrez des API externes, connectez-vous à des bases de données ou créez des outils de développement spécialisés - MCP fournit le cadre pour étendre la fonctionnalité de Roo Code afin de répondre à vos besoins spécifiques.
+MCP étend les capacités de Roo Code With CLI en vous permettant d'ajouter un nombre illimité d'outils personnalisés. Intégrez des API externes, connectez-vous à des bases de données ou créez des outils de développement spécialisés - MCP fournit le cadre pour étendre la fonctionnalité de Roo Code With CLI afin de répondre à vos besoins spécifiques.
 
 ### Personnalisation
 
-Faites fonctionner Roo Code à votre manière avec :
+Faites fonctionner Roo Code With CLI à votre manière avec :
 
 - [Instructions personnalisées](https://docs.roocode.com/advanced-usage/custom-instructions) pour un comportement personnalisé
 - [Modes personnalisés](https://docs.roocode.com/advanced-usage/custom-modes) pour des tâches spécialisées
@@ -143,7 +143,7 @@ npm run dev
 ```
 
 4. **Débogage** :
-   Appuyez sur `F5` (ou **Exécuter** → **Démarrer le débogage**) dans VSCode pour ouvrir une nouvelle session avec Roo Code chargé.
+   Appuyez sur `F5` (ou **Exécuter** → **Démarrer le débogage**) dans VSCode pour ouvrir une nouvelle session avec Roo Code With CLI chargé.
 
 Les modifications apportées à la vue web apparaîtront immédiatement. Les modifications apportées à l'extension principale nécessiteront un redémarrage de l'hôte d'extension.
 
@@ -156,7 +156,7 @@ npm run build
 Un fichier `.vsix` apparaîtra dans le répertoire `bin/` qui peut être installé avec :
 
 ```sh
-code --install-extension bin/roo-cline-<version>.vsix
+code --install-extension bin/roo-cline-with-cli-<version>.vsix
 ```
 
 Nous utilisons [changesets](https://github.com/changesets/changesets) pour le versionnement et la publication. Consultez notre `CHANGELOG.md` pour les notes de version.
@@ -165,7 +165,7 @@ Nous utilisons [changesets](https://github.com/changesets/changesets) pour le ve
 
 ## Avertissement
 
-**Veuillez noter** que Roo Code, Inc **ne fait** aucune représentation ou garantie concernant tout code, modèle ou autre outil fourni ou mis à disposition en relation avec Roo Code, tout outil tiers associé, ou tout résultat. Vous assumez **tous les risques** associés à l'utilisation de tels outils ou résultats ; ces outils sont fournis **"TELS QUELS"** et **"SELON DISPONIBILITÉ"**. Ces risques peuvent inclure, sans s'y limiter, la violation de propriété intellectuelle, les vulnérabilités ou attaques cyber, les biais, les inexactitudes, les erreurs, les défauts, les virus, les temps d'arrêt, la perte ou les dommages matériels, et/ou les blessures corporelles. Vous êtes seul responsable de votre utilisation de ces outils ou résultats (y compris, mais sans s'y limiter, leur légalité, pertinence et résultats).
+**Veuillez noter** que Roo Code With CLI, Inc **ne fait** aucune représentation ou garantie concernant tout code, modèle ou autre outil fourni ou mis à disposition en relation avec Roo Code With CLI, tout outil tiers associé, ou tout résultat. Vous assumez **tous les risques** associés à l'utilisation de tels outils ou résultats ; ces outils sont fournis **"TELS QUELS"** et **"SELON DISPONIBILITÉ"**. Ces risques peuvent inclure, sans s'y limiter, la violation de propriété intellectuelle, les vulnérabilités ou attaques cyber, les biais, les inexactitudes, les erreurs, les défauts, les virus, les temps d'arrêt, la perte ou les dommages matériels, et/ou les blessures corporelles. Vous êtes seul responsable de votre utilisation de ces outils ou résultats (y compris, mais sans s'y limiter, leur légalité, pertinence et résultats).
 
 ---
 
@@ -177,7 +177,7 @@ Nous adorons les contributions de la communauté ! Commencez par lire notre [CON
 
 ## Contributeurs
 
-Merci à tous nos contributeurs qui ont aidé à améliorer Roo Code !
+Merci à tous nos contributeurs qui ont aidé à améliorer Roo Code With CLI !
 
 <!-- START CONTRIBUTORS SECTION - AUTO-GENERATED, DO NOT EDIT MANUALLY -->
 
@@ -207,8 +207,8 @@ Merci à tous nos contributeurs qui ont aidé à améliorer Roo Code !
 
 ## Licence
 
-[Apache 2.0 © 2025 Roo Code, Inc.](../LICENSE)
+[Apache 2.0 © 2025 Roo Code With CLI, Inc.](../LICENSE)
 
 ---
 
-**Profitez de Roo Code !** Que vous le gardiez en laisse courte ou que vous le laissiez se déplacer de manière autonome, nous avons hâte de voir ce que vous allez construire. Si vous avez des questions ou des idées de fonctionnalités, passez par notre [communauté Reddit](https://www.reddit.com/r/RooCode/) ou [Discord](https://discord.gg/roocode). Bon codage !
+**Profitez de Roo Code With CLI !** Que vous le gardiez en laisse courte ou que vous le laissiez se déplacer de manière autonome, nous avons hâte de voir ce que vous allez construire. Si vous avez des questions ou des idées de fonctionnalités, passez par notre [communauté Reddit](https://www.reddit.com/r/RooCode/) ou [Discord](https://discord.gg/roocode). Bon codage !

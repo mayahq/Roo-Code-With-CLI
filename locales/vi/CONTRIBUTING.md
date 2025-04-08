@@ -1,6 +1,6 @@
-# Đóng Góp cho Roo Code
+# Đóng Góp cho Roo Code With CLI
 
-Chúng tôi rất vui mừng vì bạn quan tâm đến việc đóng góp cho Roo Code. Cho dù bạn đang sửa lỗi, thêm tính năng, hay cải thiện tài liệu của chúng tôi, mỗi đóng góp đều làm cho Roo Code thông minh hơn! Để giữ cho cộng đồng của chúng tôi sôi động và thân thiện, tất cả thành viên phải tuân thủ [Quy Tắc Ứng Xử](CODE_OF_CONDUCT.md) của chúng tôi.
+Chúng tôi rất vui mừng vì bạn quan tâm đến việc đóng góp cho Roo Code With CLI. Cho dù bạn đang sửa lỗi, thêm tính năng, hay cải thiện tài liệu của chúng tôi, mỗi đóng góp đều làm cho Roo Code With CLI thông minh hơn! Để giữ cho cộng đồng của chúng tôi sôi động và thân thiện, tất cả thành viên phải tuân thủ [Quy Tắc Ứng Xử](CODE_OF_CONDUCT.md) của chúng tôi.
 
 ## Tham Gia Cộng Đồng của Chúng Tôi
 
@@ -9,12 +9,12 @@ Chúng tôi mạnh mẽ khuyến khích tất cả người đóng góp tham gia
 - Nhận hỗ trợ và hướng dẫn thời gian thực về đóng góp của bạn
 - Kết nối với những người đóng góp khác và các thành viên nhóm cốt lõi
 - Cập nhật về sự phát triển và ưu tiên của dự án
-- Tham gia vào các cuộc thảo luận định hình tương lai của Roo Code
+- Tham gia vào các cuộc thảo luận định hình tương lai của Roo Code With CLI
 - Tìm cơ hội hợp tác với các nhà phát triển khác
 
 ## Báo Cáo Lỗi hoặc Vấn Đề
 
-Báo cáo lỗi giúp cải thiện Roo Code cho mọi người! Trước khi tạo một vấn đề mới, vui lòng [tìm kiếm những vấn đề hiện có](https://github.com/RooVetGit/Roo-Code/issues) để tránh trùng lặp. Khi bạn đã sẵn sàng báo cáo lỗi, hãy truy cập [trang vấn đề](https://github.com/RooVetGit/Roo-Code/issues/new/choose) của chúng tôi, nơi bạn sẽ tìm thấy một mẫu để giúp bạn điền thông tin liên quan.
+Báo cáo lỗi giúp cải thiện Roo Code With CLI cho mọi người! Trước khi tạo một vấn đề mới, vui lòng [tìm kiếm những vấn đề hiện có](https://github.com/RooVetGit/Roo-Code/issues) để tránh trùng lặp. Khi bạn đã sẵn sàng báo cáo lỗi, hãy truy cập [trang vấn đề](https://github.com/RooVetGit/Roo-Code/issues/new/choose) của chúng tôi, nơi bạn sẽ tìm thấy một mẫu để giúp bạn điền thông tin liên quan.
 
 <blockquote class='warning-note'>
      🔐 <b>Quan trọng:</b> Nếu bạn phát hiện lỗ hổng bảo mật, vui lòng sử dụng <a href="https://github.com/RooVetGit/Roo-Code/security/advisories/new">công cụ bảo mật Github để báo cáo riêng tư</a>.
@@ -22,15 +22,15 @@ Báo cáo lỗi giúp cải thiện Roo Code cho mọi người! Trước khi t�
 
 ## Quyết Định Làm Việc trên Cái Gì
 
-Tìm kiếm đóng góp đầu tiên tốt? Kiểm tra các vấn đề trong phần "Issue [Unassigned]" của [Dự án Github Roo Code](https://github.com/orgs/RooVetGit/projects/1) của chúng tôi. Những vấn đề này được chọn lọc đặc biệt cho người đóng góp mới và các lĩnh vực mà chúng tôi muốn nhận được sự giúp đỡ!
+Tìm kiếm đóng góp đầu tiên tốt? Kiểm tra các vấn đề trong phần "Issue [Unassigned]" của [Dự án Github Roo Code With CLI](https://github.com/orgs/RooVetGit/projects/1) của chúng tôi. Những vấn đề này được chọn lọc đặc biệt cho người đóng góp mới và các lĩnh vực mà chúng tôi muốn nhận được sự giúp đỡ!
 
-Chúng tôi cũng hoan nghênh đóng góp cho [tài liệu](https://docs.roocode.com/) của chúng tôi! Dù là sửa lỗi chính tả, cải thiện hướng dẫn hiện có, hay tạo nội dung giáo dục mới - chúng tôi muốn xây dựng một kho tài nguyên do cộng đồng thúc đẩy giúp mọi người tận dụng tối đa Roo Code. Bạn có thể nhấp vào "Edit this page" trên bất kỳ trang nào để nhanh chóng đến đúng vị trí trong Github để chỉnh sửa tệp, hoặc bạn có thể đi trực tiếp vào https://github.com/RooVetGit/Roo-Code-Docs.
+Chúng tôi cũng hoan nghênh đóng góp cho [tài liệu](https://docs.roocode.com/) của chúng tôi! Dù là sửa lỗi chính tả, cải thiện hướng dẫn hiện có, hay tạo nội dung giáo dục mới - chúng tôi muốn xây dựng một kho tài nguyên do cộng đồng thúc đẩy giúp mọi người tận dụng tối đa Roo Code With CLI. Bạn có thể nhấp vào "Edit this page" trên bất kỳ trang nào để nhanh chóng đến đúng vị trí trong Github để chỉnh sửa tệp, hoặc bạn có thể đi trực tiếp vào https://github.com/RooVetGit/Roo-Code-Docs.
 
-Nếu bạn đang lên kế hoạch làm việc trên một tính năng lớn hơn, vui lòng tạo [yêu cầu tính năng](https://github.com/RooVetGit/Roo-Code/discussions/categories/feature-requests?discussions_q=is%3Aopen+category%3A%22Feature+Requests%22+sort%3Atop) trước để chúng tôi có thể thảo luận xem nó có phù hợp với tầm nhìn của Roo Code không. Bạn cũng có thể kiểm tra [Lộ Trình Dự Án](#lộ-trình-dự-án) bên dưới để xem liệu ý tưởng của bạn có phù hợp với định hướng chiến lược của chúng tôi không.
+Nếu bạn đang lên kế hoạch làm việc trên một tính năng lớn hơn, vui lòng tạo [yêu cầu tính năng](https://github.com/RooVetGit/Roo-Code/discussions/categories/feature-requests?discussions_q=is%3Aopen+category%3A%22Feature+Requests%22+sort%3Atop) trước để chúng tôi có thể thảo luận xem nó có phù hợp với tầm nhìn của Roo Code With CLI không. Bạn cũng có thể kiểm tra [Lộ Trình Dự Án](#lộ-trình-dự-án) bên dưới để xem liệu ý tưởng của bạn có phù hợp với định hướng chiến lược của chúng tôi không.
 
 ## Lộ Trình Dự Án
 
-Roo Code có một lộ trình phát triển rõ ràng hướng dẫn các ưu tiên và định hướng tương lai của chúng tôi. Hiểu lộ trình của chúng tôi có thể giúp bạn:
+Roo Code With CLI có một lộ trình phát triển rõ ràng hướng dẫn các ưu tiên và định hướng tương lai của chúng tôi. Hiểu lộ trình của chúng tôi có thể giúp bạn:
 
 - Điều chỉnh đóng góp của bạn với mục tiêu của dự án
 - Xác định các lĩnh vực mà chuyên môn của bạn sẽ có giá trị nhất
@@ -82,10 +82,10 @@ Chúng tôi muốn giảm đáng kể số lượng lỗi và tăng kiểm tra t
 
 Chúng tôi muốn Roo nói ngôn ngữ của mọi người:
 
-- 我们希望 Roo Code 说每个人的语言
-- Queremos que Roo Code hable el idioma de todos
-- हम चाहते हैं कि Roo Code हर किसी की भाषा बोले
-- نريد أن يتحدث Roo Code لغة الجميع
+- 我们希望 Roo Code With CLI 说每个人的语言
+- Queremos que Roo Code With CLI hable el idioma de todos
+- हम चाहते हैं कि Roo Code With CLI हर किसी की भाषा बोले
+- نريد أن يتحدث Roo Code With CLI لغة الجميع
 
 Chúng tôi đặc biệt hoan nghênh những đóng góp thúc đẩy mục tiêu lộ trình của chúng tôi. Nếu bạn đang làm việc trên điều gì đó phù hợp với những trụ cột này, vui lòng đề cập đến điều đó trong mô tả PR của bạn.
 
@@ -110,7 +110,7 @@ npm run dev
 ```
 
 4. **Gỡ lỗi**:
-   Nhấn `F5` (hoặc **Run** → **Start Debugging**) trong VSCode để mở phiên mới với Roo Code được tải.
+   Nhấn `F5` (hoặc **Run** → **Start Debugging**) trong VSCode để mở phiên mới với Roo Code With CLI được tải.
 
 Các thay đổi đối với webview sẽ xuất hiện ngay lập tức. Các thay đổi đối với phần mở rộng cốt lõi sẽ yêu cầu khởi động lại máy chủ phần mở rộng.
 
@@ -123,12 +123,12 @@ npm run build
 Một tệp `.vsix` sẽ xuất hiện trong thư mục `bin/` có thể được cài đặt bằng:
 
 ```sh
-code --install-extension bin/roo-cline-<version>.vsix
+code --install-extension bin/roo-cline-with-cli-<version>.vsix
 ```
 
 ## Viết và Gửi Mã
 
-Bất kỳ ai cũng có thể đóng góp mã cho Roo Code, nhưng chúng tôi yêu cầu bạn tuân theo những hướng dẫn này để đảm bảo đóng góp của bạn có thể được tích hợp suôn sẻ:
+Bất kỳ ai cũng có thể đóng góp mã cho Roo Code With CLI, nhưng chúng tôi yêu cầu bạn tuân theo những hướng dẫn này để đảm bảo đóng góp của bạn có thể được tích hợp suôn sẻ:
 
 1. **Giữ Pull Request Tập Trung**
 

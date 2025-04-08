@@ -10,7 +10,7 @@ cat << EOF > ~/.vscode/settings.json
 }
 EOF
 
-echo "Make sure VS Code is running with the Roo Code extension active."
+echo "Make sure VS Code is running with the Roo Code With CLI extension active."
 echo "The extension will start the IPC bridge server when enabled."
 echo ""
 

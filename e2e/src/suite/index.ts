@@ -1,6 +1,6 @@
-import * as path from "path"
-import Mocha from "mocha"
 import { glob } from "glob"
+import Mocha from "mocha"
+import * as path from "path"
 import * as vscode from "vscode"
 
 import type { RooCodeAPI } from "../../../src/exports/roo-code"
@@ -12,7 +12,7 @@ declare global {
 }
 
 export async function run() {
-	const extension = vscode.extensions.getExtension<RooCodeAPI>("RooVeterinaryInc.roo-cline")
+	const extension = vscode.extensions.getExtension<RooCodeAPI>("RooVeterinaryInc.roo-cline-with-cli")
 
 	if (!extension) {
 		throw new Error("Extension not found")
@@ -35,7 +35,7 @@ export async function run() {
 		},
 	})
 
-	await vscode.commands.executeCommand("roo-cline.SidebarProvider.focus")
+	await vscode.commands.executeCommand("roo-cline-with-cli.SidebarProvider.focus")
 	await waitFor(() => api.isReady())
 
 	// Expose the API to the tests.

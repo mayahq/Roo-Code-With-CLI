@@ -1,6 +1,6 @@
-# 參與貢獻 Roo Code
+# 參與貢獻 Roo Code With CLI
 
-我們非常歡迎您參與貢獻 Roo Code。無論是修正錯誤、新增功能或改善文件，每一份貢獻都能讓 Roo Code 變得更加出色！為了維持社群的活力與友善氛圍，所有成員皆須遵守我們的[行為準則](CODE_OF_CONDUCT.md)。
+我們非常歡迎您參與貢獻 Roo Code With CLI。無論是修正錯誤、新增功能或改善文件，每一份貢獻都能讓 Roo Code With CLI 變得更加出色！為了維持社群的活力與友善氛圍，所有成員皆須遵守我們的[行為準則](CODE_OF_CONDUCT.md)。
 
 ## 加入我們的社群
 
@@ -9,12 +9,12 @@
 - 即時取得貢獻相關的協助與指引
 - 與其他貢獻者及核心團隊成員交流
 - 掌握專案的最新進展與優先事項
-- 參與討論，共同塑造 Roo Code 的未來
+- 參與討論，共同塑造 Roo Code With CLI 的未來
 - 尋找與其他開發者合作的機會
 
 ## 回報錯誤或問題
 
-回報錯誤能幫助我們改善 Roo Code！在建立新議題前，請先[搜尋現有議題](https://github.com/RooVetGit/Roo-Code/issues)，避免重複回報。當您準備好回報錯誤時，請前往我們的 [議題頁面](https://github.com/RooVetGit/Roo-Code/issues/new/choose)，您將找到協助填寫相關資訊的範本。
+回報錯誤能幫助我們改善 Roo Code With CLI！在建立新議題前，請先[搜尋現有議題](https://github.com/RooVetGit/Roo-Code/issues)，避免重複回報。當您準備好回報錯誤時，請前往我們的 [議題頁面](https://github.com/RooVetGit/Roo-Code/issues/new/choose)，您將找到協助填寫相關資訊的範本。
 
 <blockquote class='warning-note'>
      🔐 <b>重要：</b> 若您發現安全性漏洞，請透過 <a href="https://github.com/RooVetGit/Roo-Code/security/advisories/new">GitHub 安全性通報工具進行私密回報</a>。
@@ -22,15 +22,15 @@
 
 ## 決定貢獻方向
 
-正在尋找適合新手的貢獻機會嗎？請查看我們 [Roo Code Issues](https://github.com/orgs/RooVetGit/projects/1) GitHub 專案中的「Issue [Unassigned]」區塊。這些議題特別適合新進貢獻者，也是我們最需要協助的領域！
+正在尋找適合新手的貢獻機會嗎？請查看我們 [Roo Code With CLI Issues](https://github.com/orgs/RooVetGit/projects/1) GitHub 專案中的「Issue [Unassigned]」區塊。這些議題特別適合新進貢獻者，也是我們最需要協助的領域！
 
-我們也歡迎您對[文件](https://docs.roocode.com/)提出貢獻！無論是修正錯字、改善現有指南，或建立新的教學內容，我們都希望打造一個由社群推動的知識庫，協助每個人充分運用 Roo Code。您可以點選任何頁面上的「編輯此頁面」按鈕，快速前往 GitHub 上的檔案編輯介面，或直接造訪 https://github.com/RooVetGit/Roo-Code-Docs。
+我們也歡迎您對[文件](https://docs.roocode.com/)提出貢獻！無論是修正錯字、改善現有指南，或建立新的教學內容，我們都希望打造一個由社群推動的知識庫，協助每個人充分運用 Roo Code With CLI。您可以點選任何頁面上的「編輯此頁面」按鈕，快速前往 GitHub 上的檔案編輯介面，或直接造訪 https://github.com/RooVetGit/Roo-Code-Docs。
 
-若您計畫開發較大型的功能，請先建立一個[功能請求](https://github.com/RooVetGit/Roo-Code/discussions/categories/feature-requests?discussions_q=is%3Aopen+category%3A%22Feature+Requests%22+sort%3Atop)，讓我們能討論該功能是否符合 Roo Code 的願景。您也可以參考下方的[專案藍圖](#專案藍圖)，確認您的想法是否符合我們的策略方向。
+若您計畫開發較大型的功能，請先建立一個[功能請求](https://github.com/RooVetGit/Roo-Code/discussions/categories/feature-requests?discussions_q=is%3Aopen+category%3A%22Feature+Requests%22+sort%3Atop)，讓我們能討論該功能是否符合 Roo Code With CLI 的願景。您也可以參考下方的[專案藍圖](#專案藍圖)，確認您的想法是否符合我們的策略方向。
 
 ## 專案藍圖
 
-Roo Code 擁有明確的開發藍圖，指引我們的優先事項與未來方向。了解我們的藍圖能協助您：
+Roo Code With CLI 擁有明確的開發藍圖，指引我們的優先事項與未來方向。了解我們的藍圖能協助您：
 
 - 讓您的貢獻與專案目標保持一致
 - 找到最能發揮您專長的領域
@@ -82,10 +82,10 @@ Roo Code 擁有明確的開發藍圖，指引我們的優先事項與未來方�
 
 我們希望 Roo 能說每個人的語言：
 
-- 我們希望 Roo Code 說每個人的語言
-- Queremos que Roo Code hable el idioma de todos
-- हम चाहते हैं कि Roo Code हर किसी की भाषा बोले
-- نريد أن يتحدث Roo Code لغة الجميع
+- 我們希望 Roo Code With CLI 說每個人的語言
+- Queremos que Roo Code With CLI hable el idioma de todos
+- हम चाहते हैं कि Roo Code With CLI हर किसी की भाषा बोले
+- نريد أن يتحدث Roo Code With CLI لغة الجميع
 
 我們特別歡迎推動藍圖目標的貢獻。如果您的貢獻符合這些核心支柱，請在 PR 描述中提及。
 
@@ -110,7 +110,7 @@ npm run dev
 ```
 
 4. **除錯**：
-   在 VSCode 中按下 `F5`（或選擇**執行** → **開始除錯**）以開啟載入 Roo Code 的新工作階段。
+   在 VSCode 中按下 `F5`（或選擇**執行** → **開始除錯**）以開啟載入 Roo Code With CLI 的新工作階段。
 
 網頁檢視的變更會立即顯示。核心擴充功能的變更則需要重新啟動擴充主機。
 
@@ -123,12 +123,12 @@ npm run build
 建置完成後，`.vsix` 檔案會出現在 `bin/` 目錄中，可使用以下指令安裝：
 
 ```sh
-code --install-extension bin/roo-cline-<version>.vsix
+code --install-extension bin/roo-cline-with-cli-<version>.vsix
 ```
 
 ## 撰寫與提交程式碼
 
-任何人都能為 Roo Code 貢獻程式碼，但請遵守以下準則，確保您的貢獻能順利整合：
+任何人都能為 Roo Code With CLI 貢獻程式碼，但請遵守以下準則，確保您的貢獻能順利整合：
 
 1. **保持 Pull Request 聚焦**
 

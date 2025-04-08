@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@jest/globals"
-import { parseMarkdown, formatMarkdownCaptures } from "../markdownParser"
+import { formatMarkdownCaptures, parseMarkdown } from "../markdownParser"
 
 describe("markdownParser", () => {
 	it("should parse ATX headers (# style) and return captures", () => {
@@ -470,11 +470,11 @@ Some content here.
 
 ## License
 
-[Apache 2.0 © 2025 Roo Code, Inc.](./LICENSE)
+[Apache 2.0 © 2025 Roo Code With CLI, Inc.](./LICENSE)
 
 ---
 
-**Enjoy Roo Code!** Whether you keep it on a short leash or let it roam autonomously, we can't wait to see what you build.`
+**Enjoy Roo Code With CLI!** Whether you keep it on a short leash or let it roam autonomously, we can't wait to see what you build.`
 
 		const captures = parseMarkdown(content)
 		expect(captures).toBeDefined()

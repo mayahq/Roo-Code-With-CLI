@@ -1,7 +1,6 @@
-import { OpenAiHandler } from "../openai"
-import { ApiHandlerOptions } from "../../../shared/api"
 import { Anthropic } from "@anthropic-ai/sdk"
-import { DEEP_SEEK_DEFAULT_TEMPERATURE } from "../constants"
+import { ApiHandlerOptions } from "../../../shared/api"
+import { OpenAiHandler } from "../openai"
 
 // Mock OpenAI client
 const mockCreate = jest.fn()
@@ -101,7 +100,7 @@ describe("OpenAiHandler", () => {
 				apiKey: expect.any(String),
 				defaultHeaders: {
 					"HTTP-Referer": "https://github.com/RooVetGit/Roo-Cline",
-					"X-Title": "Roo Code",
+					"X-Title": "Roo Code With CLI",
 				},
 			})
 		})

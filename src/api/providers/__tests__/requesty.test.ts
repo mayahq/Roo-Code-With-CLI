@@ -1,9 +1,9 @@
 import { Anthropic } from "@anthropic-ai/sdk"
 import OpenAI from "openai"
-import { ApiHandlerOptions, ModelInfo, requestyDefaultModelInfo } from "../../../shared/api"
-import { RequestyHandler } from "../requesty"
+import { ApiHandlerOptions } from "../../../shared/api"
 import { convertToOpenAiMessages } from "../../transform/openai-format"
 import { convertToR1Format } from "../../transform/r1-format"
+import { RequestyHandler } from "../requesty"
 
 // Mock OpenAI and transform functions
 jest.mock("openai")
@@ -95,7 +95,7 @@ describe("RequestyHandler", () => {
 				apiKey: defaultOptions.requestyApiKey,
 				defaultHeaders: {
 					"HTTP-Referer": "https://github.com/RooVetGit/Roo-Cline",
-					"X-Title": "Roo Code",
+					"X-Title": "Roo Code With CLI",
 				},
 			})
 		})

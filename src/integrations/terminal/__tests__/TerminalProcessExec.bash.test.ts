@@ -1,9 +1,9 @@
 // src/integrations/terminal/__tests__/TerminalProcessExec.bash.test.ts
 
-import * as vscode from "vscode"
 import { execSync } from "child_process"
-import { TerminalProcess, ExitCodeDetails } from "../TerminalProcess"
+import * as vscode from "vscode"
 import { Terminal } from "../Terminal"
+import { ExitCodeDetails, TerminalProcess } from "../TerminalProcess"
 import { TerminalRegistry } from "../TerminalRegistry"
 // Mock the vscode module
 jest.mock("vscode", () => {
@@ -124,7 +124,7 @@ async function testTerminalCommand(
 			executeCommand: jest.fn(),
 			cwd: vscode.Uri.file("/test/path"),
 		},
-		name: "Roo Code",
+		name: "Roo Code With CLI",
 		processId: Promise.resolve(123),
 		creationOptions: {},
 		exitStatus: undefined,
@@ -255,7 +255,7 @@ async function testTerminalCommand(
 }
 
 // Import the test purposes from the common file
-import { TEST_PURPOSES, LARGE_OUTPUT_PARAMS, TEST_TEXT } from "./TerminalProcessExec.common"
+import { LARGE_OUTPUT_PARAMS, TEST_PURPOSES, TEST_TEXT } from "./TerminalProcessExec.common"
 
 describe("TerminalProcess with Bash Command Output", () => {
 	beforeAll(() => {

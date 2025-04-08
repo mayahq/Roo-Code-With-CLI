@@ -1,19 +1,19 @@
+import crypto from "crypto"
+import EventEmitter from "events"
 import fs from "fs/promises"
 import os from "os"
 import * as path from "path"
-import crypto from "crypto"
-import EventEmitter from "events"
 
-import simpleGit, { SimpleGit } from "simple-git"
 import { globby } from "globby"
 import pWaitFor from "p-wait-for"
+import simpleGit, { SimpleGit } from "simple-git"
 
-import { fileExistsAtPath } from "../../utils/fs"
 import { CheckpointStorage } from "../../shared/checkpoints"
+import { fileExistsAtPath } from "../../utils/fs"
 
 import { GIT_DISABLED_SUFFIX } from "./constants"
-import { CheckpointDiff, CheckpointResult, CheckpointEventMap } from "./types"
 import { getExcludePatterns } from "./excludes"
+import { CheckpointDiff, CheckpointEventMap, CheckpointResult } from "./types"
 
 export abstract class ShadowCheckpointService extends EventEmitter {
 	public readonly taskId: string
@@ -91,7 +91,7 @@ export abstract class ShadowCheckpointService extends EventEmitter {
 			await git.init()
 			await git.addConfig("core.worktree", this.workspaceDir) // Sets the working tree to the current workspace.
 			await git.addConfig("commit.gpgSign", "false") // Disable commit signing for shadow repo.
-			await git.addConfig("user.name", "Roo Code")
+			await git.addConfig("user.name", "Roo Code With CLI")
 			await git.addConfig("user.email", "noreply@example.com")
 			await this.writeExcludeFile()
 			await this.stageAll(git)

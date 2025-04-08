@@ -1,6 +1,6 @@
 # VSCode Integration Tests
 
-This document describes the integration test setup for the Roo Code VSCode extension.
+This document describes the integration test setup for the Roo Code With CLI VSCode extension.
 
 ## Overview
 

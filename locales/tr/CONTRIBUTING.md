@@ -1,6 +1,6 @@
-# Roo Code'a Katkıda Bulunma
+# Roo Code With CLI'a Katkıda Bulunma
 
-Roo Code'a katkıda bulunmakla ilgilendiğiniz için çok mutluyuz. İster bir hatayı düzeltiyor, ister bir özellik ekliyor, ister belgelerimizi geliştiriyor olun, her katkı Roo Code'u daha akıllı hale getirir! Topluluğumuzu canlı ve misafirperver tutmak için tüm üyelerin [Davranış Kuralları](CODE_OF_CONDUCT.md)'na uyması gerekir.
+Roo Code With CLI'a katkıda bulunmakla ilgilendiğiniz için çok mutluyuz. İster bir hatayı düzeltiyor, ister bir özellik ekliyor, ister belgelerimizi geliştiriyor olun, her katkı Roo Code With CLI'u daha akıllı hale getirir! Topluluğumuzu canlı ve misafirperver tutmak için tüm üyelerin [Davranış Kuralları](CODE_OF_CONDUCT.md)'na uyması gerekir.
 
 ## Topluluğumuza Katılın
 
@@ -9,12 +9,12 @@ Tüm katkıda bulunanları [Discord topluluğumuza](https://discord.gg/roocode) 
 - Katkılarınız hakkında gerçek zamanlı yardım ve rehberlik alın
 - Diğer katkıda bulunanlar ve çekirdek ekip üyeleriyle bağlantı kurun
 - Proje gelişmeleri ve öncelikleri hakkında güncel kalın
-- Roo Code'un geleceğini şekillendiren tartışmalara katılın
+- Roo Code With CLI'un geleceğini şekillendiren tartışmalara katılın
 - Diğer geliştiricilerle işbirliği fırsatları bulun
 
 ## Hataları veya Sorunları Bildirme
 
-Hata raporları Roo Code'u herkes için daha iyi hale getirmeye yardımcı olur! Yeni bir sorun oluşturmadan önce, lütfen yinelemeleri önlemek için [mevcut olanları arayın](https://github.com/RooVetGit/Roo-Code/issues). Bir hatayı bildirmeye hazır olduğunuzda, ilgili bilgileri doldurmanıza yardımcı olacak bir şablon bulacağınız [sorunlar sayfamıza](https://github.com/RooVetGit/Roo-Code/issues/new/choose) gidin.
+Hata raporları Roo Code With CLI'u herkes için daha iyi hale getirmeye yardımcı olur! Yeni bir sorun oluşturmadan önce, lütfen yinelemeleri önlemek için [mevcut olanları arayın](https://github.com/RooVetGit/Roo-Code/issues). Bir hatayı bildirmeye hazır olduğunuzda, ilgili bilgileri doldurmanıza yardımcı olacak bir şablon bulacağınız [sorunlar sayfamıza](https://github.com/RooVetGit/Roo-Code/issues/new/choose) gidin.
 
 <blockquote class='warning-note'>
      🔐 <b>Önemli:</b> Bir güvenlik açığı keşfederseniz, lütfen <a href="https://github.com/RooVetGit/Roo-Code/security/advisories/new">özel olarak bildirmek için Github güvenlik aracını kullanın</a>.
@@ -22,15 +22,15 @@ Hata raporları Roo Code'u herkes için daha iyi hale getirmeye yardımcı olur!
 
 ## Ne Üzerinde Çalışacağınıza Karar Verme
 
-İyi bir ilk katkı mı arıyorsunuz? [Roo Code Sorunları](https://github.com/orgs/RooVetGit/projects/1) Github Projemizin "Issue [Unassigned]" bölümündeki sorunları kontrol edin. Bunlar özellikle yeni katkıda bulunanlar ve biraz yardıma ihtiyaç duyduğumuz alanlar için seçilmiştir!
+İyi bir ilk katkı mı arıyorsunuz? [Roo Code With CLI Sorunları](https://github.com/orgs/RooVetGit/projects/1) Github Projemizin "Issue [Unassigned]" bölümündeki sorunları kontrol edin. Bunlar özellikle yeni katkıda bulunanlar ve biraz yardıma ihtiyaç duyduğumuz alanlar için seçilmiştir!
 
-[Belgelerimize](https://docs.roocode.com/) katkıları da memnuniyetle karşılıyoruz! İster yazım hatalarını düzeltmek, mevcut kılavuzları geliştirmek veya yeni eğitim içeriği oluşturmak olsun - herkesin Roo Code'dan en iyi şekilde yararlanmasına yardımcı olan topluluk odaklı bir kaynak deposu oluşturmak istiyoruz. Dosyayı düzenlemek için Github'daki doğru yere hızlıca gitmek için herhangi bir sayfada "Edit this page" düğmesine tıklayabilir veya doğrudan https://github.com/RooVetGit/Roo-Code-Docs adresine dalabilirsiniz.
+[Belgelerimize](https://docs.roocode.com/) katkıları da memnuniyetle karşılıyoruz! İster yazım hatalarını düzeltmek, mevcut kılavuzları geliştirmek veya yeni eğitim içeriği oluşturmak olsun - herkesin Roo Code With CLI'dan en iyi şekilde yararlanmasına yardımcı olan topluluk odaklı bir kaynak deposu oluşturmak istiyoruz. Dosyayı düzenlemek için Github'daki doğru yere hızlıca gitmek için herhangi bir sayfada "Edit this page" düğmesine tıklayabilir veya doğrudan https://github.com/RooVetGit/Roo-Code-Docs adresine dalabilirsiniz.
 
-Daha büyük bir özellik üzerinde çalışmayı planlıyorsanız, lütfen önce bir [özellik isteği](https://github.com/RooVetGit/Roo-Code/discussions/categories/feature-requests?discussions_q=is%3Aopen+category%3A%22Feature+Requests%22+sort%3Atop) oluşturun, böylece Roo Code'un vizyonuyla uyumlu olup olmadığını tartışabiliriz. Ayrıca, fikrinizin stratejik yönümüze uyup uymadığını görmek için aşağıdaki [Proje Yol Haritası](#proje-yol-haritası)'nı kontrol edebilirsiniz.
+Daha büyük bir özellik üzerinde çalışmayı planlıyorsanız, lütfen önce bir [özellik isteği](https://github.com/RooVetGit/Roo-Code/discussions/categories/feature-requests?discussions_q=is%3Aopen+category%3A%22Feature+Requests%22+sort%3Atop) oluşturun, böylece Roo Code With CLI'un vizyonuyla uyumlu olup olmadığını tartışabiliriz. Ayrıca, fikrinizin stratejik yönümüze uyup uymadığını görmek için aşağıdaki [Proje Yol Haritası](#proje-yol-haritası)'nı kontrol edebilirsiniz.
 
 ## Proje Yol Haritası
 
-Roo Code, önceliklerimizi ve gelecekteki yönümüzü yönlendiren net bir geliştirme yol haritasına sahiptir. Yol haritamızı anlamak size şu konularda yardımcı olabilir:
+Roo Code With CLI, önceliklerimizi ve gelecekteki yönümüzü yönlendiren net bir geliştirme yol haritasına sahiptir. Yol haritamızı anlamak size şu konularda yardımcı olabilir:
 
 - Katkılarınızı proje hedefleriyle uyumlu hale getirmek
 - Uzmanlığınızın en değerli olacağı alanları belirlemek
@@ -82,10 +82,10 @@ Hata sayısını önemli ölçüde azaltmak ve otomatik testleri artırmak istiy
 
 Roo'nun herkesin dilini konuşmasını istiyoruz:
 
-- 我们希望 Roo Code 说每个人的语言
-- Queremos que Roo Code hable el idioma de todos
-- हम चाहते हैं कि Roo Code हर किसी की भाषा बोले
-- نريد أن يتحدث Roo Code لغة الجميع
+- 我们希望 Roo Code With CLI 说每个人的语言
+- Queremos que Roo Code With CLI hable el idioma de todos
+- हम चाहते हैं कि Roo Code With CLI हर किसी की भाषा बोले
+- نريد أن يتحدث Roo Code With CLI لغة الجميع
 
 Özellikle yol haritamızın hedeflerini ileriye taşıyan katkıları memnuniyetle karşılıyoruz. Bu sütunlarla uyumlu bir şey üzerinde çalışıyorsanız, lütfen PR açıklamanızda bundan bahsedin.
 
@@ -110,7 +110,7 @@ npm run dev
 ```
 
 4. **Hata ayıklama**:
-   VSCode'da `F5` tuşuna basın (veya **Run** → **Start Debugging**) Roo Code yüklenmiş yeni bir oturum açmak için.
+   VSCode'da `F5` tuşuna basın (veya **Run** → **Start Debugging**) Roo Code With CLI yüklenmiş yeni bir oturum açmak için.
 
 Webview'daki değişiklikler anında görünecektir. Ana uzantıdaki değişiklikler uzantı ana bilgisayarının yeniden başlatılmasını gerektirecektir.
 
@@ -123,12 +123,12 @@ npm run build
 `bin/` dizininde bir `.vsix` dosyası görünecek ve şu komutla kurulabilir:
 
 ```sh
-code --install-extension bin/roo-cline-<version>.vsix
+code --install-extension bin/roo-cline-with-cli-<version>.vsix
 ```
 
 ## Kod Yazma ve Gönderme
 
-Herkes Roo Code'a kod katkısında bulunabilir, ancak katkılarınızın sorunsuz bir şekilde entegre edilebilmesi için bu kurallara uymanızı rica ediyoruz:
+Herkes Roo Code With CLI'a kod katkısında bulunabilir, ancak katkılarınızın sorunsuz bir şekilde entegre edilebilmesi için bu kurallara uymanızı rica ediyoruz:
 
 1. **Pull Request'leri Odaklı Tutun**
 

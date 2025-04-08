@@ -16,7 +16,7 @@ English • [Català](locales/ca/README.md) • [Deutsch](locales/de/README.md) 
   <h1>Roo Code With CLI</h1>
   <h3>A fork of Roo Code with CLI control capabilities</h3>
   
-  <a href="https://marketplace.visualstudio.com/items?itemName=RooVeterinaryInc.roo-cline" target="_blank"><img src="https://img.shields.io/badge/Based%20on%20Roo%20Code-blue?style=for-the-badge&logo=visualstudiocode&logoColor=white" alt="Based on Roo Code"></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=RooVeterinaryInc.roo-cline-with-cli" target="_blank"><img src="https://img.shields.io/badge/Based%20on%20Roo%20Code-blue?style=for-the-badge&logo=visualstudiocode&logoColor=white" alt="Based on Roo Code With CLI"></a>
   <a href="https://github.com/RooVetGit/Roo-Code" target="_blank"><img src="https://img.shields.io/badge/Original%20Repository-gray?style=for-the-badge&logo=github&logoColor=white" alt="Original Repository"></a>
   <a href="https://docs.roocode.com" target="_blank"><img src="https://img.shields.io/badge/Documentation-6B46C1?style=for-the-badge&logo=readthedocs&logoColor=white" alt="Documentation"></a>
   
@@ -24,7 +24,7 @@ English • [Català](locales/ca/README.md) • [Deutsch](locales/de/README.md) 
 
 # Roo Code With CLI
 
-This repository is a fork of [Roo Code](https://github.com/RooVetGit/Roo-Code) that adds a powerful CLI interface to control and configure the Roo Code VS Code extension programmatically. This enables automation, scripting, and remote management of Roo Code configurations.
+This repository is a fork of [Roo Code With CLI](https://github.com/RooVetGit/Roo-Code) that adds a powerful CLI interface to control and configure the Roo Code With CLI VS Code extension programmatically. This enables automation, scripting, and remote management of Roo Code With CLI configurations.
 
 ## What's New in This Fork
 
@@ -33,7 +33,7 @@ This fork implements the **Roo Configuration Bridge**, which allows you to:
 - Manage provider configurations via command line
 - Save, load, list, and delete configuration profiles
 - Assign configurations to specific Roo modes
-- Automate Roo Code setup in CI/CD pipelines or team environments
+- Automate Roo Code With CLI setup in CI/CD pipelines or team environments
 - Script configuration changes for different projects or tasks
 
 ## Architecture
@@ -158,9 +158,9 @@ For more detailed documentation, see:
 - [Roo Configuration Bridge Documentation](docs/roo-config-bridge.md)
 - [CLI Bridge Plan](docs/cli-bridge-plan.md)
 
-## Original Roo Code Features
+## Original Roo Code With CLI Features
 
-This fork maintains all the original features of Roo Code:
+This fork maintains all the original features of Roo Code With CLI:
 
 - 🚀 **Generate Code** from natural language descriptions
 - 🔧 **Refactor & Debug** existing code
@@ -190,7 +190,7 @@ npm run dev
 ```
 
 4. **Debug**:
-   Press `F5` (or **Run** → **Start Debugging**) in VSCode to open a new session with Roo Code loaded.
+   Press `F5` (or **Run** → **Start Debugging**) in VSCode to open a new session with Roo Code With CLI loaded.
 
 ## Contributing
 
@@ -198,14 +198,14 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Disclaimer
 
-This is an unofficial fork of Roo Code. All original disclaimers from Roo Code apply:
+This is an unofficial fork of Roo Code With CLI. All original disclaimers from Roo Code With CLI apply:
 
-**Please note** that Roo Code, Inc does **not** make any representations or warranties regarding any code, models, or other tools provided or made available in connection with Roo Code, any associated third-party tools, or any resulting outputs. You assume **all risks** associated with the use of any such tools or outputs; such tools are provided on an **"AS IS"** and **"AS AVAILABLE"** basis.
+**Please note** that Roo Code With CLI, Inc does **not** make any representations or warranties regarding any code, models, or other tools provided or made available in connection with Roo Code With CLI, any associated third-party tools, or any resulting outputs. You assume **all risks** associated with the use of any such tools or outputs; such tools are provided on an **"AS IS"** and **"AS AVAILABLE"** basis.
 
 ## License
 
-[Apache 2.0 © 2025 Roo Code, Inc.](./LICENSE)
+[Apache 2.0 © 2025 Roo Code With CLI, Inc.](./LICENSE)
 
 ---
 
-**Note:** This fork is maintained independently from the original Roo Code project. For the official version, please visit [the original Roo Code repository](https://github.com/RooVetGit/Roo-Code).
+**Note:** This fork is maintained independently from the original Roo Code With CLI project. For the official version, please visit [the original Roo Code With CLI repository](https://github.com/RooVetGit/Roo-Code).

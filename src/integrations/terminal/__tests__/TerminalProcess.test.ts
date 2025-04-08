@@ -2,8 +2,8 @@
 
 import * as vscode from "vscode"
 
-import { TerminalProcess, mergePromise } from "../TerminalProcess"
 import { Terminal } from "../Terminal"
+import { TerminalProcess, mergePromise } from "../TerminalProcess"
 import { TerminalRegistry } from "../TerminalRegistry"
 
 // Mock vscode.window.createTerminal
@@ -45,7 +45,7 @@ describe("TerminalProcess", () => {
 			shellIntegration: {
 				executeCommand: jest.fn(),
 			},
-			name: "Roo Code",
+			name: "Roo Code With CLI",
 			processId: Promise.resolve(123),
 			creationOptions: {},
 			exitStatus: undefined,

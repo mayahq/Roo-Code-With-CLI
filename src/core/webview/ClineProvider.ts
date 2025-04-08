@@ -1,58 +1,58 @@
+import EventEmitter from "events"
+import fs from "fs/promises"
 import os from "os"
 import * as path from "path"
-import fs from "fs/promises"
-import EventEmitter from "events"
 
 import { Anthropic } from "@anthropic-ai/sdk"
-import delay from "delay"
 import axios from "axios"
+import delay from "delay"
 import pWaitFor from "p-wait-for"
 import * as vscode from "vscode"
 
-import { GlobalState, ProviderSettings, RooCodeSettings } from "../../schemas"
-import { t } from "../../i18n"
 import { setPanel } from "../../activate/registerCommands"
+import { buildApiHandler } from "../../api"
+import { t } from "../../i18n"
+import { downloadTask } from "../../integrations/misc/export-markdown"
+import { Terminal, TERMINAL_SHELL_INTEGRATION_TIMEOUT } from "../../integrations/terminal/Terminal"
+import { getTheme } from "../../integrations/theme/getTheme"
+import WorkspaceTracker from "../../integrations/workspace/WorkspaceTracker"
+import { GlobalState, ProviderSettings, RooCodeSettings } from "../../schemas"
+import { ShadowCheckpointService } from "../../services/checkpoints/ShadowCheckpointService"
+import { McpHub } from "../../services/mcp/McpHub"
+import { McpServerManager } from "../../services/mcp/McpServerManager"
+import { telemetryService } from "../../services/telemetry/TelemetryService"
 import {
 	ApiConfiguration,
 	ApiProvider,
-	ModelInfo,
-	requestyDefaultModelId,
-	requestyDefaultModelInfo,
-	openRouterDefaultModelId,
-	openRouterDefaultModelInfo,
 	glamaDefaultModelId,
 	glamaDefaultModelInfo,
+	ModelInfo,
+	openRouterDefaultModelId,
+	openRouterDefaultModelInfo,
+	requestyDefaultModelId,
+	requestyDefaultModelInfo,
 } from "../../shared/api"
 import { findLast } from "../../shared/array"
-import { supportPrompt } from "../../shared/support-prompt"
+import { experimentDefault } from "../../shared/experiments"
+import { ExtensionMessage } from "../../shared/ExtensionMessage"
 import { GlobalFileNames } from "../../shared/globalFileNames"
 import { HistoryItem } from "../../shared/HistoryItem"
-import { ExtensionMessage } from "../../shared/ExtensionMessage"
-import { Mode, PromptComponent, defaultModeSlug, getModeBySlug, getGroupName } from "../../shared/modes"
-import { experimentDefault } from "../../shared/experiments"
 import { formatLanguage } from "../../shared/language"
-import { Terminal, TERMINAL_SHELL_INTEGRATION_TIMEOUT } from "../../integrations/terminal/Terminal"
-import { downloadTask } from "../../integrations/misc/export-markdown"
-import { getTheme } from "../../integrations/theme/getTheme"
-import WorkspaceTracker from "../../integrations/workspace/WorkspaceTracker"
-import { McpHub } from "../../services/mcp/McpHub"
-import { McpServerManager } from "../../services/mcp/McpServerManager"
-import { ShadowCheckpointService } from "../../services/checkpoints/ShadowCheckpointService"
+import { defaultModeSlug, Mode, PromptComponent } from "../../shared/modes"
+import { supportPrompt } from "../../shared/support-prompt"
+import { WebviewMessage } from "../../shared/WebviewMessage"
 import { fileExistsAtPath } from "../../utils/fs"
+import { getWorkspacePath } from "../../utils/path"
 import { setSoundEnabled } from "../../utils/sound"
 import { setTtsEnabled, setTtsSpeed } from "../../utils/tts"
-import { ContextProxy } from "../config/ContextProxy"
-import { ProviderSettingsManager } from "../config/ProviderSettingsManager"
-import { CustomModesManager } from "../config/CustomModesManager"
-import { buildApiHandler } from "../../api"
-import { ACTION_NAMES } from "../CodeActionProvider"
 import { Cline, ClineOptions } from "../Cline"
+import { ACTION_NAMES } from "../CodeActionProvider"
+import { ContextProxy } from "../config/ContextProxy"
+import { CustomModesManager } from "../config/CustomModesManager"
+import { ProviderSettingsManager } from "../config/ProviderSettingsManager"
 import { getNonce } from "./getNonce"
 import { getUri } from "./getUri"
-import { telemetryService } from "../../services/telemetry/TelemetryService"
-import { getWorkspacePath } from "../../utils/path"
 import { webviewMessageHandler } from "./webviewMessageHandler"
-import { WebviewMessage } from "../../shared/WebviewMessage"
 
 /**
  * https://github.com/microsoft/vscode-webview-ui-toolkit-samples/blob/main/default/weather-webview/src/providers/WeatherViewProvider.ts
@@ -64,8 +64,8 @@ export type ClineProviderEvents = {
 }
 
 export class ClineProvider extends EventEmitter<ClineProviderEvents> implements vscode.WebviewViewProvider {
-	public static readonly sideBarId = "roo-cline.SidebarProvider" // used in package.json as the view's id. This value cannot be changed due to how vscode caches views based on their id, and updating the id would break existing instances of the extension.
-	public static readonly tabPanelId = "roo-cline.TabPanelProvider"
+	public static readonly sideBarId = "roo-cline-with-cli.SidebarProvider" // used in package.json as the view's id. This value cannot be changed due to how vscode caches views based on their id, and updating the id would break existing instances of the extension.
+	public static readonly tabPanelId = "roo-cline-with-cli.TabPanelProvider"
 	private static activeInstances: Set<ClineProvider> = new Set()
 	private disposables: vscode.Disposable[] = []
 	private view?: vscode.WebviewView | vscode.WebviewPanel
@@ -236,7 +236,7 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 
 		// If no visible provider, try to show the sidebar view
 		if (!visibleProvider) {
-			await vscode.commands.executeCommand("roo-cline.SidebarProvider.focus")
+			await vscode.commands.executeCommand("roo-cline-with-cli.SidebarProvider.focus")
 			// Wait briefly for the view to become visible
 			await delay(100)
 			visibleProvider = ClineProvider.getVisibleInstance()
@@ -644,7 +644,7 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 					<script nonce="${nonce}">
 						window.IMAGES_BASE_URI = "${imagesUri}"
 					</script>
-					<title>Roo Code</title>
+					<title>Roo Code With CLI</title>
 				</head>
 				<body>
 					<div id="root"></div>
@@ -729,7 +729,7 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 			<script nonce="${nonce}">
 				window.IMAGES_BASE_URI = "${imagesUri}"
 			</script>
-            <title>Roo Code</title>
+            <title>Roo Code With CLI</title>
           </head>
           <body>
             <noscript>You need to enable JavaScript to run this app.</noscript>
@@ -1204,7 +1204,8 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 
 		const telemetryKey = process.env.POSTHOG_API_KEY
 		const machineId = vscode.env.machineId
-		const allowedCommands = vscode.workspace.getConfiguration("roo-cline").get<string[]>("allowedCommands") || []
+		const allowedCommands =
+			vscode.workspace.getConfiguration("roo-cline-with-cli").get<string[]>("allowedCommands") || []
 		const cwd = this.cwd
 
 		return {

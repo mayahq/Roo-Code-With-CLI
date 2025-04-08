@@ -1,4 +1,4 @@
-name: Code QA Roo Code
+name: Code QA Roo Code With CLI
 
 on:
   workflow_dispatch:

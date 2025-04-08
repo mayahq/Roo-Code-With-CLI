@@ -1,10 +1,10 @@
 // src/integrations/terminal/__tests__/TerminalProcessExec.cmd.test.ts
 import * as vscode from "vscode"
-import { TerminalProcess, ExitCodeDetails } from "../TerminalProcess"
 import { Terminal } from "../Terminal"
+import { ExitCodeDetails, TerminalProcess } from "../TerminalProcess"
 import { TerminalRegistry } from "../TerminalRegistry"
-import { createCmdCommandStream } from "./streamUtils/cmdStream"
 import { createCmdMockStream } from "./streamUtils"
+import { createCmdCommandStream } from "./streamUtils/cmdStream"
 
 // Skip this test on non-Windows platforms
 const isWindows = process.platform === "win32"
@@ -72,7 +72,7 @@ async function testCmdCommand(
 			executeCommand: jest.fn(),
 			cwd: vscode.Uri.file("C:\\test\\path"),
 		},
-		name: "Roo Code",
+		name: "Roo Code With CLI",
 		processId: Promise.resolve(123),
 		creationOptions: {},
 		exitStatus: undefined,
@@ -215,7 +215,7 @@ async function testCmdCommand(
 }
 
 // Import the test purposes from the common file
-import { TEST_PURPOSES, LARGE_OUTPUT_PARAMS, TEST_TEXT } from "./TerminalProcessExec.common"
+import { LARGE_OUTPUT_PARAMS, TEST_PURPOSES, TEST_TEXT } from "./TerminalProcessExec.common"
 
 describePlatform("TerminalProcess with CMD Command Output", () => {
 	beforeAll(() => {

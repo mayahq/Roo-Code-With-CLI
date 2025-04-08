@@ -1,47 +1,47 @@
-import * as path from "path"
 import fs from "fs/promises"
 import pWaitFor from "p-wait-for"
+import * as path from "path"
 import * as vscode from "vscode"
 
-import { ClineProvider } from "./ClineProvider"
-import { CheckpointStorage, Language, ApiConfigMeta } from "../../schemas"
 import { changeLanguage, t } from "../../i18n"
+import { ApiConfigMeta, CheckpointStorage, Language } from "../../schemas"
 import { ApiConfiguration } from "../../shared/api"
-import { supportPrompt } from "../../shared/support-prompt"
 import { GlobalFileNames } from "../../shared/globalFileNames"
+import { supportPrompt } from "../../shared/support-prompt"
+import { ClineProvider } from "./ClineProvider"
 
-import { checkoutDiffPayloadSchema, checkoutRestorePayloadSchema, WebviewMessage } from "../../shared/WebviewMessage"
-import { checkExistKey } from "../../shared/checkExistApiConfig"
-import { EXPERIMENT_IDS, experimentDefault, ExperimentId } from "../../shared/experiments"
-import { Terminal } from "../../integrations/terminal/Terminal"
+import { buildApiHandler } from "../../api"
+import { getGlamaModels } from "../../api/providers/glama"
+import { getLmStudioModels } from "../../api/providers/lmstudio"
+import { getOllamaModels } from "../../api/providers/ollama"
+import { getOpenAiModels } from "../../api/providers/openai"
+import { getOpenRouterModels } from "../../api/providers/openrouter"
+import { getRequestyModels } from "../../api/providers/requesty"
+import { getUnboundModels } from "../../api/providers/unbound"
+import { getVsCodeLmModels } from "../../api/providers/vscode-lm"
 import { openFile, openImage } from "../../integrations/misc/open-file"
 import { selectImages } from "../../integrations/misc/process-images"
+import { Terminal } from "../../integrations/terminal/Terminal"
 import { getTheme } from "../../integrations/theme/getTheme"
+import { GlobalState } from "../../schemas"
 import { discoverChromeHostUrl, tryChromeHostUrl } from "../../services/browser/browserDiscovery"
 import { searchWorkspaceFiles } from "../../services/search/file-search"
-import { fileExistsAtPath } from "../../utils/fs"
-import { playSound, setSoundEnabled, setSoundVolume } from "../../utils/sound"
-import { playTts, setTtsEnabled, setTtsSpeed, stopTts } from "../../utils/tts"
-import { singleCompletionHandler } from "../../utils/single-completion-handler"
-import { searchCommits } from "../../utils/git"
-import { exportSettings, importSettings } from "../config/importExport"
-import { getOpenRouterModels } from "../../api/providers/openrouter"
-import { getGlamaModels } from "../../api/providers/glama"
-import { getUnboundModels } from "../../api/providers/unbound"
-import { getRequestyModels } from "../../api/providers/requesty"
-import { getOpenAiModels } from "../../api/providers/openai"
-import { getOllamaModels } from "../../api/providers/ollama"
-import { getVsCodeLmModels } from "../../api/providers/vscode-lm"
-import { getLmStudioModels } from "../../api/providers/lmstudio"
-import { openMention } from "../mentions"
 import { telemetryService } from "../../services/telemetry/TelemetryService"
 import { TelemetrySetting } from "../../shared/TelemetrySetting"
+import { checkoutDiffPayloadSchema, checkoutRestorePayloadSchema, WebviewMessage } from "../../shared/WebviewMessage"
+import { checkExistKey } from "../../shared/checkExistApiConfig"
+import { experimentDefault } from "../../shared/experiments"
+import { defaultModeSlug, getGroupName, getModeBySlug, Mode } from "../../shared/modes"
+import { fileExistsAtPath } from "../../utils/fs"
+import { searchCommits } from "../../utils/git"
 import { getWorkspacePath } from "../../utils/path"
-import { Mode, defaultModeSlug, getModeBySlug, getGroupName } from "../../shared/modes"
+import { singleCompletionHandler } from "../../utils/single-completion-handler"
+import { playSound, setSoundEnabled, setSoundVolume } from "../../utils/sound"
+import { playTts, setTtsEnabled, setTtsSpeed, stopTts } from "../../utils/tts"
+import { exportSettings, importSettings } from "../config/importExport"
 import { getDiffStrategy } from "../diff/DiffStrategy"
+import { openMention } from "../mentions"
 import { SYSTEM_PROMPT } from "../prompts/system"
-import { buildApiHandler } from "../../api"
-import { GlobalState } from "../../schemas"
 
 export const webviewMessageHandler = async (provider: ClineProvider, message: WebviewMessage) => {
 	// Utility functions provided for concise get/update of global state via contextProxy API.
@@ -488,7 +488,7 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 			await provider.context.globalState.update("allowedCommands", message.commands)
 			// Also update workspace settings
 			await vscode.workspace
-				.getConfiguration("roo-cline")
+				.getConfiguration("roo-cline-with-cli")
 				.update("allowedCommands", message.commands, vscode.ConfigurationTarget.Global)
 			break
 		case "openMcpSettings": {
@@ -1289,7 +1289,7 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 			break
 		case "humanRelayResponse":
 			if (message.requestId && message.text) {
-				vscode.commands.executeCommand("roo-cline.handleHumanRelayResponse", {
+				vscode.commands.executeCommand("roo-cline-with-cli.handleHumanRelayResponse", {
 					requestId: message.requestId,
 					text: message.text,
 					cancelled: false,
@@ -1299,7 +1299,7 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 
 		case "humanRelayCancel":
 			if (message.requestId) {
-				vscode.commands.executeCommand("roo-cline.handleHumanRelayResponse", {
+				vscode.commands.executeCommand("roo-cline-with-cli.handleHumanRelayResponse", {
 					requestId: message.requestId,
 					cancelled: true,
 				})

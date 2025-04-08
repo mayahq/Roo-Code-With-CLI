@@ -1,45 +1,45 @@
 "use client"
 
-import { useCallback, useRef, useState } from "react"
-import { useRouter } from "next/navigation"
-import { z } from "zod"
-import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import fuzzysort from "fuzzysort"
+import { Check, ChevronsUpDown, CircleCheck, HardDriveUpload, Rocket, X } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useCallback, useRef, useState } from "react"
+import { FormProvider, useForm } from "react-hook-form"
 import { toast } from "sonner"
-import { X, Rocket, Check, ChevronsUpDown, HardDriveUpload, CircleCheck } from "lucide-react"
+import { z } from "zod"
 
 import { globalSettingsSchema, providerSettingsSchema, rooCodeDefaults } from "@evals/types"
 
-import { createRun } from "@/lib/server/runs"
-import { createRunSchema as formSchema, type CreateRun as FormValues } from "@/lib/schemas"
-import { cn } from "@/lib/utils"
-import { useOpenRouterModels } from "@/hooks/use-open-router-models"
-import { useExercises } from "@/hooks/use-exercises"
 import {
 	Button,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormDescription,
-	FormMessage,
-	Textarea,
-	Tabs,
-	TabsList,
-	TabsTrigger,
-	MultiSelect,
 	Command,
 	CommandEmpty,
 	CommandGroup,
 	CommandInput,
 	CommandItem,
 	CommandList,
+	FormControl,
+	FormDescription,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+	MultiSelect,
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
 	ScrollArea,
+	Tabs,
+	TabsList,
+	TabsTrigger,
+	Textarea,
 } from "@/components/ui"
+import { useExercises } from "@/hooks/use-exercises"
+import { useOpenRouterModels } from "@/hooks/use-open-router-models"
+import { createRunSchema as formSchema, type CreateRun as FormValues } from "@/lib/schemas"
+import { createRun } from "@/lib/server/runs"
+import { cn } from "@/lib/utils"
 
 import { SettingsDiff } from "./settings-diff"
 
@@ -287,7 +287,8 @@ export function NewRun() {
 									<div className="flex items-center gap-1 p-2 border-b">
 										<CircleCheck className="size-4 text-ring" />
 										<div className="text-sm">
-											Imported valid Roo Code settings. Showing differences from default settings.
+											Imported valid Roo Code With CLI settings. Showing differences from default
+											settings.
 										</div>
 									</div>
 									<SettingsDiff defaultSettings={rooCodeDefaults} customSettings={settings} />
@@ -295,8 +296,8 @@ export function NewRun() {
 							</ScrollArea>
 						) : (
 							<FormDescription>
-								Fully configure how Roo Code for this run using a settings file that was exported by Roo
-								Code.
+								Fully configure how Roo Code With CLI for this run using a settings file that was
+								exported by Roo Code.
 							</FormDescription>
 						)}
 						<FormMessage />

@@ -16,7 +16,7 @@
 	"startRouter": "Configuración rápida a través de un router",
 	"startCustom": "Usa tu propia clave API",
 	"telemetry": {
-		"title": "Ayuda a mejorar Roo Code",
+		"title": "Ayuda a mejorar Roo Code With CLI",
 		"anonymousTelemetry": "Envía datos de uso y errores anónimos para ayudarnos a corregir errores y mejorar la extensión. Nunca se envía código, texto o información personal.",
 		"changeSettings": "Siempre puedes cambiar esto en la parte inferior de la <settingsLink>configuración</settingsLink>",
 		"settings": "configuración",

@@ -45,10 +45,24 @@ if (fs.existsSync(cliSrcDir)) {
 
 		// Copy the CLI files to the dist directory
 		console.log("Copying CLI files to dist/roo-cli...")
+
+		// Copy the dist directory
 		const cliDistSrcDir = path.join(cliSrcDir, "dist")
 		if (fs.existsSync(cliDistSrcDir)) {
 			// Copy all files from roo-cli/dist to dist/roo-cli
 			copyDirectory(cliDistSrcDir, cliDistDir)
+
+			// Copy package.json
+			fs.copyFileSync(path.join(cliSrcDir, "package.json"), path.join(cliDistDir, "package.json"))
+
+			// Copy node_modules directory
+			const cliNodeModulesDir = path.join(cliSrcDir, "node_modules")
+			const distNodeModulesDir = path.join(cliDistDir, "node_modules")
+			if (fs.existsSync(cliNodeModulesDir)) {
+				console.log("Copying node_modules directory...")
+				copyDirectory(cliNodeModulesDir, distNodeModulesDir)
+			}
+
 			console.log("CLI files copied successfully.")
 		} else {
 			console.error("CLI build directory not found. Build may have failed.")

@@ -24,23 +24,33 @@ export class CliInstaller {
 		try {
 			this.outputChannel.appendLine("Installing Roo CLI...")
 
-			// Path to the CLI directory within the extension
-			const cliDistPath = path.join(this.extensionPath, "dist", "roo-cli")
+			// Try to find the CLI directory
+			let cliPath = path.join(this.extensionPath, "roo-cli")
+			let distCliPath = path.join(this.extensionPath, "dist", "roo-cli")
 
-			// Check if the CLI directory exists
-			if (!fs.existsSync(cliDistPath)) {
-				this.outputChannel.appendLine(`CLI directory not found at ${cliDistPath}`)
+			// Check which CLI directory exists
+			let sourcePath = ""
+			if (fs.existsSync(cliPath)) {
+				sourcePath = cliPath
+				this.outputChannel.appendLine(`Using CLI directory at ${cliPath}`)
+			} else if (fs.existsSync(distCliPath)) {
+				sourcePath = distCliPath
+				this.outputChannel.appendLine(`Using CLI directory at ${distCliPath}`)
+			} else {
+				this.outputChannel.appendLine(`CLI directory not found at ${cliPath} or ${distCliPath}`)
 				return
 			}
 
-			// Create a package.json for the CLI in a temporary directory
+			// Create a temporary directory for the CLI installation
 			const tempDir = path.join(os.tmpdir(), "roo-cli-install")
-			if (!fs.existsSync(tempDir)) {
-				fs.mkdirSync(tempDir, { recursive: true })
+			if (fs.existsSync(tempDir)) {
+				// Clean up any existing temp directory
+				this.removeDirectory(tempDir)
 			}
+			fs.mkdirSync(tempDir, { recursive: true })
 
-			// Copy the CLI files to the temporary directory
-			this.copyDirectory(cliDistPath, tempDir)
+			// Copy the CLI files to the temporary directory, including node_modules
+			this.copyDirectory(sourcePath, tempDir)
 
 			// Create a package.json file in the temporary directory
 			const packageJson = {
@@ -145,6 +155,27 @@ export class CliInstaller {
 				reject(error)
 			})
 		})
+	}
+
+	/**
+	 * Remove a directory recursively
+	 */
+	private removeDirectory(directory: string): void {
+		if (fs.existsSync(directory)) {
+			const files = fs.readdirSync(directory)
+
+			for (const file of files) {
+				const currentPath = path.join(directory, file)
+
+				if (fs.statSync(currentPath).isDirectory()) {
+					this.removeDirectory(currentPath)
+				} else {
+					fs.unlinkSync(currentPath)
+				}
+			}
+
+			fs.rmdirSync(directory)
+		}
 	}
 
 	/**

@@ -1,3 +1,4 @@
+import * as fs from "fs"
 import ipc from "node-ipc"
 import * as os from "os"
 import * as path from "path"
@@ -59,9 +60,17 @@ export class ConfigBridgeServer {
 
 			// Start the IPC server
 			ipc.serve(ConfigBridgeServer.getSocketPath(), () => {
-				this.outputChannel.appendLine(
-					`Roo Configuration Bridge IPC server started at ${ConfigBridgeServer.getSocketPath()}`,
-				)
+				const socketPath = ConfigBridgeServer.getSocketPath()
+
+				// Set socket permissions to 666 (read/write for all users)
+				try {
+					fs.chmodSync(socketPath, 0o666)
+					this.outputChannel.appendLine(`Set permissions 666 on socket file: ${socketPath}`)
+				} catch (error) {
+					this.outputChannel.appendLine(`Failed to set permissions on socket file: ${error}`)
+				}
+
+				this.outputChannel.appendLine(`Roo Configuration Bridge IPC server started at ${socketPath}`)
 				this.isRunning = true
 
 				// Handle messages

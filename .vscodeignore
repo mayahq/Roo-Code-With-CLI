@@ -12,8 +12,8 @@ src/**
 # Include CLI files but exclude source
 roo-cli/src/**
 roo-cli/tsconfig.json
-!roo-cli/node_modules/**
 !dist/roo-cli/**
+!roo-cli/node_modules/**
 .gitignore
 .yarnrc
 esbuild.js

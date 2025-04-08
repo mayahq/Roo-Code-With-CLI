@@ -46,6 +46,12 @@ if (fs.existsSync(cliSrcDir)) {
 		// Copy the CLI files to the dist directory
 		console.log("Copying CLI files to dist/roo-cli...")
 
+		// Clean the dist directory first
+		if (fs.existsSync(cliDistDir)) {
+			removeDirectory(cliDistDir)
+			fs.mkdirSync(cliDistDir, { recursive: true })
+		}
+
 		// Copy the dist directory
 		const cliDistSrcDir = path.join(cliSrcDir, "dist")
 		if (fs.existsSync(cliDistSrcDir)) {
@@ -98,6 +104,27 @@ function copyDirectory(source, destination) {
 		} else {
 			fs.copyFileSync(sourcePath, destPath)
 		}
+	}
+}
+
+/**
+ * Remove a directory recursively
+ */
+function removeDirectory(directory) {
+	if (fs.existsSync(directory)) {
+		const files = fs.readdirSync(directory)
+
+		for (const file of files) {
+			const currentPath = path.join(directory, file)
+
+			if (fs.statSync(currentPath).isDirectory()) {
+				removeDirectory(currentPath)
+			} else {
+				fs.unlinkSync(currentPath)
+			}
+		}
+
+		fs.rmdirSync(directory)
 	}
 }
 

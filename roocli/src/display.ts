@@ -1,4 +1,20 @@
+import boxen from "boxen"
 import chalk from "chalk"
+import { highlight } from "cli-highlight"
+import { marked } from "marked"
+import TerminalRenderer from "marked-terminal"
+
+// Configure marked to use TerminalRenderer with syntax highlighting
+marked.setOptions({
+	renderer: new TerminalRenderer({
+		highlight: (code: string, lang: string) => {
+			if (lang === "shell" || lang === "bash") {
+				return highlight(code, { language: "bash", ignoreIllegals: true })
+			}
+			return code // No highlighting for other languages
+		},
+	}),
+})
 
 /**
  * Display utilities for formatting and printing output to the console.
@@ -142,6 +158,30 @@ export class Display {
 	 */
 	commandOutput(message: string): void {
 		console.log(chalk.gray(message))
+	}
+
+	/**
+	 * Displays reasoning content in a styled box.
+	 * @param content The reasoning content to display.
+	 */
+	displayReasoning(content: string): void {
+		const styledContent = chalk.italic.gray(content)
+		const boxedContent = boxen(styledContent, { padding: 1, borderColor: "gray" })
+		console.log(boxedContent)
+	}
+
+	/**
+	 * Displays command output with syntax highlighting in a box.
+	 * @param content The command output content to display.
+	 */
+	displayCommandOutput(content: string): void {
+		// Format content as a shell code block
+		const formattedContent = `\`\`\`shell\n${content}\n\`\`\``
+		// Render using marked with terminal renderer
+		const renderedMarkdown = marked(formattedContent)
+		// Draw a box around the rendered content
+		const boxedContent = boxen(renderedMarkdown, { padding: 1 })
+		console.log(boxedContent)
 	}
 
 	/**

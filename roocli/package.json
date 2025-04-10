@@ -16,12 +16,20 @@
 	"license": "ISC",
 	"description": "",
 	"dependencies": {
+		"boxen": "^5.1.2",
 		"chalk": "^4.1.2",
+		"cli-highlight": "^2.1.11",
+		"marked": "^4.3.0",
+		"marked-terminal": "^5.1.1",
+		"parse5": "^7.2.1",
+		"prompts": "^2.4.2",
 		"ws": "^8.18.1",
 		"yargs": "^17.7.2"
 	},
 	"devDependencies": {
+		"@types/marked": "^4.3.0",
 		"@types/node": "^22.14.0",
+		"@types/prompts": "^2.4.4",
 		"@types/ws": "^8.18.1",
 		"@types/yargs": "^17.0.33",
 		"typescript": "^5.8.3"

@@ -1,3 +1,4 @@
+import prompts from "prompts"
 import * as readline from "readline"
 import { display } from "./display"
 import { IpcClient } from "./ipcClient"
@@ -172,50 +173,10 @@ export class Repl {
 			// Display user message
 			display.userMessage(message)
 
-			// Get client ID
-			const clientId = this.ipcClient.getClientId()
-
-			if (!clientId) {
-				// Wait a short time for the client ID to be assigned if it's not available yet
-				await new Promise((resolve) => setTimeout(resolve, 500))
-			}
-
 			// Always check if we have a current task ID
 			if (this.currentTaskId) {
-				const clientId = this.ipcClient.getClientId()
-
-				// Send message to VS Code extension with client ID and task ID
-				// Don't await this message to avoid hanging
-				this.ipcClient
-					.sendMessage({
-						type: "sendMessage",
-						text: message,
-						clientId: clientId || undefined, // Get the latest client ID
-						taskId: this.currentTaskId, // Always include the task ID for existing sessions
-					})
-					.catch((error) => {
-						display.error(`Failed to send message: ${error}`)
-						this.rl.prompt()
-						return
-					})
-
-				// Also send a registerClientId message to ensure the mapping is set
-				if (clientId) {
-					this.ipcClient
-						.sendMessage({
-							type: "registerClientId",
-							clientId: clientId,
-							taskId: this.currentTaskId,
-						})
-						.catch((error) => {
-							display.debug(`Error registering client ID: ${error}`)
-						})
-				}
-
-				// Reset the waiting for user input flag if it was set
-				this.isWaitingForUserInput = false
-
-				// Message sent successfully
+				// If we have a task ID, send the response
+				await this.sendResponse(message)
 			} else {
 				// If we don't have a task ID yet, we need to create one first
 				// This should only happen on the first message after starting the CLI
@@ -223,12 +184,6 @@ export class Repl {
 				await this.startNewTask(message)
 				return
 			}
-
-			// Start streaming indicator
-			this.isStreaming = true
-			this.currentStreamedMessage = ""
-			this.hasDisplayedPrefix = false // Reset the prefix flag for a new message
-			this.lastMessageId = null // Reset the last message ID
 
 			// Don't prompt until we get a response
 		} catch (error) {
@@ -282,7 +237,7 @@ export class Repl {
 
 		switch (message.type) {
 			case "partialMessage":
-				this.handlePartialMessage(message)
+				await this.handlePartialMessage(message)
 				break
 			case "state":
 				this.handleStateUpdate(message)
@@ -332,7 +287,7 @@ export class Repl {
 	 * Handles a partial message from the IPC client.
 	 * @param message The partial message.
 	 */
-	private handlePartialMessage(message: any): void {
+	private async handlePartialMessage(message: any): Promise<void> {
 		// Debug logs are handled by the display class which checks verbose mode internally
 
 		// Only initialize streaming if we're not already streaming
@@ -345,182 +300,215 @@ export class Repl {
 		}
 
 		if (message.partialMessage?.type === "say") {
-			// Handle AI response
-			if (message.partialMessage.say === "text" || message.partialMessage.say === "ai_response") {
-				const content = message.partialMessage.text || message.partialMessage.content || ""
+			const sayType = message.partialMessage.say
+			const content =
+				message.partialMessage.text || message.partialMessage.content || message.partialMessage.reasoning || ""
 
-				// Skip empty content messages
-				if (content.trim() === "") {
-					return
-				}
+			// Skip empty content messages
+			if (content.trim() === "") {
+				return
+			}
 
-				// Check if this is a duplicate message
-				if (this.isDuplicateMessage(content)) {
-					return
-				}
+			// Handle different say types
+			switch (sayType) {
+				case "reasoning":
+					// Use the new displayReasoning method
+					display.displayReasoning(content)
+					this.hasDisplayedPrefix = false
+					break
 
-				// If we haven't displayed the prefix yet, print the "Roo: " prefix
-				if (!this.hasDisplayedPrefix) {
-					process.stdout.write(chalk.bold.blue("Roo: "))
-					this.hasDisplayedPrefix = true
-				}
+				case "error":
+					display.error(content)
+					this.hasDisplayedPrefix = false
+					this.isStreaming = false
+					this.rl.prompt()
+					break
 
-				// Calculate the new content by comparing with what we've already displayed
-				let newContent = ""
-				if (content.startsWith(this.currentStreamedMessage)) {
-					// Normal case: new content is appended
-					newContent = content.slice(this.currentStreamedMessage.length)
-				} else if (this.currentStreamedMessage.startsWith(content)) {
-					// Content is a subset of what we already have - ignore
-					return
-				} else {
-					// Handle case where content might be completely different
-					newContent = content
-					// Clear line and reprint if needed
-					if (this.currentStreamedMessage.length > 0) {
-						// Don't add another "Roo: " prefix, we already have one
-						process.stdout.write("\r\n")
-						// Only print the prefix if we haven't already
-						if (!this.hasDisplayedPrefix) {
-							process.stdout.write(chalk.bold.blue("Roo: "))
-							this.hasDisplayedPrefix = true
+				case "command_output":
+					// Use the new displayCommandOutput method
+					display.displayCommandOutput(content)
+					this.hasDisplayedPrefix = false
+					break
+
+				case "task":
+				case "new_task":
+					display.info(`[Task] ${content}`)
+					this.hasDisplayedPrefix = false
+					break
+
+				case "checkpoint_saved":
+					display.info(`[Checkpoint] ${content || "Saved"}`)
+					this.hasDisplayedPrefix = false
+					break
+
+				case "browser_action":
+				case "browser_action_result":
+					display.info(`[Browser] ${content}`)
+					this.hasDisplayedPrefix = false
+					break
+
+				case "text":
+				case "ai_response":
+					// Handle AI response (text) with existing streaming logic
+					// Check if this is a duplicate message
+					if (this.isDuplicateMessage(content)) {
+						return
+					}
+
+					// If we haven't displayed the prefix yet, print the "Roo: " prefix
+					if (!this.hasDisplayedPrefix) {
+						process.stdout.write(chalk.bold.blue("Roo: "))
+						this.hasDisplayedPrefix = true
+					}
+
+					// Calculate the new content by comparing with what we've already displayed
+					let newContent = ""
+					if (content.startsWith(this.currentStreamedMessage)) {
+						// Normal case: new content is appended
+						newContent = content.slice(this.currentStreamedMessage.length)
+					} else if (this.currentStreamedMessage.startsWith(content)) {
+						// Content is a subset of what we already have - ignore
+						return
+					} else {
+						// Handle case where content might be completely different
+						newContent = content
+						// Clear line and reprint if needed
+						if (this.currentStreamedMessage.length > 0) {
+							// Don't add another "Roo: " prefix, we already have one
+							process.stdout.write("\r\n")
+							// Only print the prefix if we haven't already
+							if (!this.hasDisplayedPrefix) {
+								process.stdout.write(chalk.bold.blue("Roo: "))
+								this.hasDisplayedPrefix = true
+							}
 						}
 					}
-				}
 
-				// Only print if there's new content
-				if (newContent.length > 0) {
-					process.stdout.write(newContent)
-					// Update the current streamed message
-					this.currentStreamedMessage = content
-				}
-			}
-			// Handle reasoning
-			else if (message.partialMessage.say === "reasoning") {
-				const content = message.partialMessage.reasoning || message.partialMessage.text || ""
-
-				if (content.trim() === "") {
-					return
-				}
-
-				// If we haven't displayed the reasoning prefix yet
-				if (!this.hasDisplayedPrefix) {
-					process.stdout.write(chalk.italic.gray("\n[Reasoning]: "))
-					this.hasDisplayedPrefix = true
-				}
-
-				// Calculate and display new content
-				let newContent = ""
-				if (content.startsWith(this.currentStreamedMessage)) {
-					newContent = content.slice(this.currentStreamedMessage.length)
-				} else {
-					newContent = content
-				}
-
-				if (newContent.length > 0) {
-					process.stdout.write(chalk.italic.gray(newContent))
-					this.currentStreamedMessage = content
-				}
-			}
-			// Handle tool execution
-			else if (message.partialMessage.say === "tool" || message.partialMessage.say === "tool_execution") {
-				const tool = message.partialMessage.tool?.tool || "unknown"
-				const content = message.partialMessage.text || message.partialMessage.content || ""
-
-				// If this is a new tool execution, print a new line and the tool header
-				if (!this.currentStreamedMessage.includes(tool)) {
-					process.stdout.write("\n\n")
-					display.toolExecution(tool, "")
-				}
-
-				// Calculate the new content
-				let newContent = ""
-				if (content.startsWith(this.currentStreamedMessage)) {
-					newContent = content.slice(this.currentStreamedMessage.length)
-				} else {
-					newContent = content
-					// Clear line and reprint if needed
-					if (this.currentStreamedMessage.length > 0) {
-						process.stdout.write("\r\n")
-						display.toolExecution(tool, "")
+					// Only print if there's new content
+					if (newContent.length > 0) {
+						process.stdout.write(newContent)
+						// Update the current streamed message
+						this.currentStreamedMessage = content
 					}
-				}
+					break
 
-				// Print the new content
-				process.stdout.write(newContent)
-
-				// Update the current streamed message
-				this.currentStreamedMessage = content
-			}
-			// Handle error messages
-			else if (message.partialMessage.say === "error") {
-				const content = message.partialMessage.text || ""
-				if (content.trim() === "") return
-
-				display.error(`\n${content}`)
-				this.isStreaming = false
-				this.rl.prompt()
-			}
-			// Handle command output
-			else if (message.partialMessage.say === "command_output") {
-				const content = message.partialMessage.text || ""
-				if (content.trim() === "") return
-
-				display.commandOutput(content)
-			}
-			// Handle browser action
-			else if (
-				message.partialMessage.say === "browser_action" ||
-				message.partialMessage.say === "browser_action_result"
-			) {
-				const content = message.partialMessage.text || ""
-				if (content.trim() === "") return
-
-				display.info(`\n[Browser] ${content}`)
-			}
-			// Handle task messages
-			else if (message.partialMessage.say === "task" || message.partialMessage.say === "new_task") {
-				const content = message.partialMessage.text || ""
-				if (content.trim() === "") return
-
-				display.info(`\n[Task] ${content}`)
-			}
-			// Handle checkpoint messages
-			else if (message.partialMessage.say === "checkpoint_saved") {
-				display.info("\n[Checkpoint saved]")
-			}
-			// Handle all other say types
-			else {
-				const content = message.partialMessage.text || ""
-				if (content.trim() === "") return
-
-				// Display with the say type as a prefix
-				display.info(`\n[${message.partialMessage.say}] ${content}`)
+				default:
+					// Handle all other say types
+					display.info(`[${sayType}] ${content}`)
+					this.hasDisplayedPrefix = false
+					break
 			}
 		} else if (message.partialMessage?.type === "ask") {
-			// Handle different ask types
-			if (message.partialMessage.ask === "followup") {
-				// Handle followup questions
-				display.info(`\n${message.partialMessage.text || "Input required:"}`)
-			} else if (message.partialMessage.ask === "command") {
-				// Handle command approval requests
-				display.info(`\n[Command approval required] ${message.partialMessage.text || ""}`)
-			} else if (message.partialMessage.ask === "tool") {
-				// Handle tool approval requests
-				display.info(`\n[Tool approval required] ${message.partialMessage.text || ""}`)
-			} else if (message.partialMessage.ask === "browser_action_launch") {
-				// Handle browser launch requests
-				display.info(`\n[Browser launch requested] ${message.partialMessage.text || ""}`)
-			} else {
-				// Handle all other ask types
-				display.info(
-					`\n[${message.partialMessage.ask || "Input required"}] ${message.partialMessage.text || ""}`,
-				)
+			// Instead of handling ask types here, call the new handleInteractiveAsk method
+			await this.handleInteractiveAsk(message.partialMessage)
+		}
+	}
+
+	/**
+	 * Handles interactive ask messages with prompts.
+	 * @param askMessage The ask message to handle.
+	 */
+	private async handleInteractiveAsk(askMessage: any): Promise<void> {
+		// Pause readline to avoid interference with prompts
+		this.rl.pause()
+
+		try {
+			let responseValue: string | undefined
+
+			switch (askMessage.ask) {
+				case "followup":
+					// Parse question and suggestions
+					const question = askMessage.text || "Please select an option:"
+					const suggestions = askMessage.suggestions || []
+
+					// Create choices for prompts
+					const choices = [
+						...suggestions.map((suggestion: string) => ({ title: suggestion, value: suggestion })),
+						{ title: "(Provide custom response)", value: "__CUSTOM__" },
+					]
+
+					// Show selection prompt
+					const response = await prompts({
+						type: "select",
+						name: "value",
+						message: question,
+						choices: choices,
+					})
+
+					// Handle custom response
+					if (response.value === "__CUSTOM__") {
+						const customResponse = await prompts({
+							type: "text",
+							name: "value",
+							message: "Your custom response:",
+						})
+						responseValue = customResponse.value
+					} else {
+						responseValue = response.value
+					}
+					break
+
+				case "command":
+				case "tool":
+				case "browser_action_launch":
+					// Display the text
+					display.info(`\n${askMessage.text || ""}`)
+
+					// Show approval prompt
+					const approvalResponse = await prompts({
+						type: "select",
+						name: "value",
+						message: "Do you want to approve this action?",
+						choices: [
+							{ title: "Approve", value: "approve" },
+							{ title: "Reject", value: "reject" },
+							{ title: "(Provide custom response)", value: "__CUSTOM__" },
+						],
+					})
+
+					// Handle custom response
+					if (approvalResponse.value === "__CUSTOM__") {
+						const customResponse = await prompts({
+							type: "text",
+							name: "value",
+							message: "Your custom response:",
+						})
+						responseValue = customResponse.value
+					} else {
+						responseValue = approvalResponse.value
+					}
+					break
+
+				default:
+					// Display the text
+					display.info(`\n${askMessage.text || ""}`)
+
+					// Show text input prompt
+					const textResponse = await prompts({
+						type: "text",
+						name: "value",
+						message: "Your response:",
+					})
+					responseValue = textResponse.value
+					break
 			}
 
-			// Set flags to indicate we're waiting for user input but not starting a new session
-			this.isStreaming = false
-			this.isWaitingForUserInput = true
+			// Handle cancellation
+			if (responseValue === undefined) {
+				display.info("\nResponse cancelled.")
+				return
+			}
+
+			// Send the response
+			await this.sendResponse(responseValue)
+		} catch (error) {
+			display.error(`Error handling interactive prompt: ${error}`)
+		} finally {
+			// Reset flags
+			this.isWaitingForUserInput = false
+
+			// Resume readline
+			this.rl.resume()
 			this.rl.prompt()
 		}
 	}
@@ -612,6 +600,47 @@ export class Repl {
 			this.hasDisplayedPrefix = false
 			this.isWaitingForUserInput = false
 			process.stdout.write("\n\n")
+			this.rl.prompt()
+		}
+	}
+
+	/**
+	 * Sends a response to the current task.
+	 * @param responseText The response text to send.
+	 */
+	private async sendResponse(responseText: string): Promise<void> {
+		try {
+			// Get client ID
+			const clientId = this.ipcClient.getClientId()
+
+			// Send message to VS Code extension with client ID and task ID
+			await this.ipcClient.sendMessage({
+				type: "sendMessage",
+				text: responseText,
+				clientId: clientId || undefined, // Get the latest client ID
+				taskId: this.currentTaskId, // Always include the task ID for existing sessions
+			})
+
+			// Also send a registerClientId message to ensure the mapping is set
+			if (clientId) {
+				this.ipcClient
+					.sendMessage({
+						type: "registerClientId",
+						clientId: clientId,
+						taskId: this.currentTaskId,
+					})
+					.catch((error) => {
+						display.debug(`Error registering client ID: ${error}`)
+					})
+			}
+
+			// Start streaming indicator
+			this.isStreaming = true
+			this.currentStreamedMessage = ""
+			this.hasDisplayedPrefix = false // Reset the prefix flag for a new message
+			this.lastMessageId = null // Reset the last message ID
+		} catch (error) {
+			display.error(`Failed to send response: ${error}`)
 			this.rl.prompt()
 		}
 	}

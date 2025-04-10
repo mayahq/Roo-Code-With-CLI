@@ -148,6 +148,42 @@ export class Display {
 	 * @param tool The tool name.
 	 * @param message The tool execution message.
 	 */
+	/**
+	 * Displays a tool use notification in a collapsible box.
+	 * @param tool The tool name.
+	 * @param path The path or target of the tool.
+	 * @param content The full content of the tool use.
+	 */
+	displayToolUse(tool: string, path: string, content: string): void {
+		// Create a header with just tool and path information
+		const header = chalk.bold.yellow(`▼ [${tool}] ${path}`)
+
+		// Create a box for the content with minimal height to simulate collapse
+		const lines = content.split("\n")
+		const previewContent = lines.length > 0 ? lines[0] + (lines.length > 1 ? " ..." : "") : ""
+
+		// Create a box with just the preview content
+		const boxedContent = boxen(previewContent, {
+			padding: 0,
+			margin: {
+				top: 0,
+				bottom: 0,
+				left: 2,
+			},
+			borderColor: "yellow",
+			dimBorder: true,
+		})
+
+		// Display the header and collapsed content
+		console.log(header)
+		console.log(boxedContent)
+	}
+
+	/**
+	 * Prints a tool execution message to the console.
+	 * @param tool The tool name.
+	 * @param message The tool execution message.
+	 */
 	toolExecution(tool: string, message: string): void {
 		console.log(chalk.bold.yellow(`[${tool}] `) + message)
 	}

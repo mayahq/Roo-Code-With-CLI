@@ -14,6 +14,7 @@ export class Repl {
 	private currentTaskId: string | null = null
 	private hasDisplayedPrefix = false // Track whether we've displayed the "Roo: " prefix
 	private lastMessageId: string | null = null // Track the last message ID to avoid duplicates
+	private isWaitingForUserInput = false // Track whether we're waiting for user input in response to an "ask" message
 
 	constructor(ipcClient: IpcClient) {
 		this.ipcClient = ipcClient
@@ -60,6 +61,7 @@ export class Repl {
 				this.isStreaming = false
 				this.currentStreamedMessage = ""
 				this.hasDisplayedPrefix = false
+				this.isWaitingForUserInput = false
 				this.rl.prompt()
 			} else {
 				// Otherwise, exit the REPL
@@ -118,6 +120,10 @@ export class Repl {
 				break
 			case "mode":
 				this.handleModeSwitch(args.join(" "))
+				break
+			case "new":
+				// Start a new task/conversation
+				this.startNewTask(args.join(" "))
 				break
 			case "verbose":
 				// Toggle verbose mode using the Display class
@@ -206,23 +212,16 @@ export class Repl {
 						})
 				}
 
+				// Reset the waiting for user input flag if it was set
+				this.isWaitingForUserInput = false
+
 				// Message sent successfully
 			} else {
-				// Starting new task
-
-				// Send message to VS Code extension with client ID
-				// Don't await this message to avoid hanging
-				this.ipcClient
-					.sendMessage({
-						type: "newTask",
-						text: message,
-						clientId: this.ipcClient.getClientId() || undefined, // Get the latest client ID
-					})
-					.catch((error) => {
-						display.error(`Failed to send message: ${error}`)
-						this.rl.prompt()
-						return
-					})
+				// If we don't have a task ID yet, we need to create one first
+				// This should only happen on the first message after starting the CLI
+				display.info("Creating new session...")
+				await this.startNewTask(message)
+				return
 			}
 
 			// Start streaming indicator
@@ -396,10 +395,37 @@ export class Repl {
 					this.currentStreamedMessage = content
 				}
 			}
+			// Handle reasoning
+			else if (message.partialMessage.say === "reasoning") {
+				const content = message.partialMessage.reasoning || message.partialMessage.text || ""
+
+				if (content.trim() === "") {
+					return
+				}
+
+				// If we haven't displayed the reasoning prefix yet
+				if (!this.hasDisplayedPrefix) {
+					process.stdout.write(chalk.italic.gray("\n[Reasoning]: "))
+					this.hasDisplayedPrefix = true
+				}
+
+				// Calculate and display new content
+				let newContent = ""
+				if (content.startsWith(this.currentStreamedMessage)) {
+					newContent = content.slice(this.currentStreamedMessage.length)
+				} else {
+					newContent = content
+				}
+
+				if (newContent.length > 0) {
+					process.stdout.write(chalk.italic.gray(newContent))
+					this.currentStreamedMessage = content
+				}
+			}
 			// Handle tool execution
-			else if (message.partialMessage.say === "tool_execution") {
+			else if (message.partialMessage.say === "tool" || message.partialMessage.say === "tool_execution") {
 				const tool = message.partialMessage.tool?.tool || "unknown"
-				const content = message.partialMessage.content || ""
+				const content = message.partialMessage.text || message.partialMessage.content || ""
 
 				// If this is a new tool execution, print a new line and the tool header
 				if (!this.currentStreamedMessage.includes(tool)) {
@@ -426,10 +452,75 @@ export class Repl {
 				// Update the current streamed message
 				this.currentStreamedMessage = content
 			}
+			// Handle error messages
+			else if (message.partialMessage.say === "error") {
+				const content = message.partialMessage.text || ""
+				if (content.trim() === "") return
+
+				display.error(`\n${content}`)
+				this.isStreaming = false
+				this.rl.prompt()
+			}
+			// Handle command output
+			else if (message.partialMessage.say === "command_output") {
+				const content = message.partialMessage.text || ""
+				if (content.trim() === "") return
+
+				display.commandOutput(content)
+			}
+			// Handle browser action
+			else if (
+				message.partialMessage.say === "browser_action" ||
+				message.partialMessage.say === "browser_action_result"
+			) {
+				const content = message.partialMessage.text || ""
+				if (content.trim() === "") return
+
+				display.info(`\n[Browser] ${content}`)
+			}
+			// Handle task messages
+			else if (message.partialMessage.say === "task" || message.partialMessage.say === "new_task") {
+				const content = message.partialMessage.text || ""
+				if (content.trim() === "") return
+
+				display.info(`\n[Task] ${content}`)
+			}
+			// Handle checkpoint messages
+			else if (message.partialMessage.say === "checkpoint_saved") {
+				display.info("\n[Checkpoint saved]")
+			}
+			// Handle all other say types
+			else {
+				const content = message.partialMessage.text || ""
+				if (content.trim() === "") return
+
+				// Display with the say type as a prefix
+				display.info(`\n[${message.partialMessage.say}] ${content}`)
+			}
 		} else if (message.partialMessage?.type === "ask") {
-			// Handle ask messages (e.g., asking for user input)
-			display.info(`\n${message.partialMessage.content || "Input required:"}`)
+			// Handle different ask types
+			if (message.partialMessage.ask === "followup") {
+				// Handle followup questions
+				display.info(`\n${message.partialMessage.text || "Input required:"}`)
+			} else if (message.partialMessage.ask === "command") {
+				// Handle command approval requests
+				display.info(`\n[Command approval required] ${message.partialMessage.text || ""}`)
+			} else if (message.partialMessage.ask === "tool") {
+				// Handle tool approval requests
+				display.info(`\n[Tool approval required] ${message.partialMessage.text || ""}`)
+			} else if (message.partialMessage.ask === "browser_action_launch") {
+				// Handle browser launch requests
+				display.info(`\n[Browser launch requested] ${message.partialMessage.text || ""}`)
+			} else {
+				// Handle all other ask types
+				display.info(
+					`\n[${message.partialMessage.ask || "Input required"}] ${message.partialMessage.text || ""}`,
+				)
+			}
+
+			// Set flags to indicate we're waiting for user input but not starting a new session
 			this.isStreaming = false
+			this.isWaitingForUserInput = true
 			this.rl.prompt()
 		}
 	}
@@ -446,6 +537,7 @@ export class Repl {
 		if (this.isStreaming && message.state && (message.state.taskCompleted || message.state.taskAborted)) {
 			this.isStreaming = false
 			this.hasDisplayedPrefix = false
+			this.isWaitingForUserInput = false
 			process.stdout.write("\n\n")
 			this.rl.prompt()
 		}
@@ -495,6 +587,7 @@ export class Repl {
 			if (this.isStreaming) {
 				this.isStreaming = false
 				this.hasDisplayedPrefix = false
+				this.isWaitingForUserInput = false
 				process.stdout.write("\n\n")
 				this.rl.prompt()
 			}
@@ -517,7 +610,53 @@ export class Repl {
 		) {
 			this.isStreaming = false
 			this.hasDisplayedPrefix = false
+			this.isWaitingForUserInput = false
 			process.stdout.write("\n\n")
+			this.rl.prompt()
+		}
+	}
+
+	/**
+	 * Starts a new task with the given message.
+	 * @param message The message to send.
+	 */
+	private async startNewTask(message: string): Promise<void> {
+		try {
+			// Reset task ID and flags
+			this.currentTaskId = null
+			this.isWaitingForUserInput = false
+
+			// Only display user message if it's not empty
+			if (message.trim()) {
+				display.userMessage(message)
+			}
+
+			// Get client ID
+			const clientId = this.ipcClient.getClientId()
+
+			// Send message to VS Code extension with client ID
+			// Don't await this message to avoid hanging
+			this.ipcClient
+				.sendMessage({
+					type: "newTask",
+					text: message,
+					clientId: clientId || undefined, // Get the latest client ID
+				})
+				.catch((error) => {
+					display.error(`Failed to create new task: ${error}`)
+					this.rl.prompt()
+					return
+				})
+
+			// Start streaming indicator if there's a message
+			if (message.trim()) {
+				this.isStreaming = true
+				this.currentStreamedMessage = ""
+				this.hasDisplayedPrefix = false // Reset the prefix flag for a new message
+				this.lastMessageId = null // Reset the last message ID
+			}
+		} catch (error) {
+			display.error(`Failed to create new task: ${error}`)
 			this.rl.prompt()
 		}
 	}

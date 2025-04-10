@@ -137,6 +137,14 @@ export class Display {
 	}
 
 	/**
+	 * Prints a command output message to the console.
+	 * @param message The command output message.
+	 */
+	commandOutput(message: string): void {
+		console.log(chalk.gray(message))
+	}
+
+	/**
 	 * Prints a spinner to indicate loading.
 	 * @param message The loading message.
 	 * @returns A function to stop the spinner.
@@ -184,6 +192,7 @@ export class Display {
 		console.log(
 			chalk.bold("/mode <mode>") + " - Switch to a different mode (e.g., /mode code, /mode debug, /mode ask)",
 		)
+		console.log(chalk.bold("/new [message]") + " - Start a new conversation (optionally with an initial message)")
 		console.log(chalk.bold("/verbose") + " - Toggle verbose mode for debugging")
 
 		this.section("Profile Management")
@@ -197,8 +206,9 @@ export class Display {
 		console.log(chalk.bold('roo use <profile> "<message>"') + " - Use a profile for a single message")
 
 		this.section("Session Management")
-		console.log("Each time you start the CLI without a message, a new session begins.")
-		console.log("All messages within that session use the same task ID until you exit.")
+		console.log("When you start the CLI, a session is created for your conversation.")
+		console.log("All messages within that session use the same task ID until you use /new or exit.")
+		console.log("Use /new to start a fresh conversation with a clean context.")
 		console.log("Messages are streamed in real-time as they are received from the AI.")
 
 		console.log("")

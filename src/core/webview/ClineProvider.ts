@@ -75,6 +75,7 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 		return this._workspaceTracker
 	}
 	protected mcpHub?: McpHub // Change from private to protected
+	private cliBridgeServer?: any // Reference to the CliBridgeServer instance for broadcasting to CLI clients
 
 	public isViewLaunched = false
 	public settingsImportedAt?: number
@@ -573,9 +574,22 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 		)
 		return cline
 	}
-
 	public async postMessageToWebview(message: ExtensionMessage) {
+		// Send message to webview UI
 		await this.view?.webview.postMessage(message)
+
+		// Also broadcast to CLI clients if CliBridgeServer is available
+		if (this.cliBridgeServer) {
+			this.cliBridgeServer.broadcastMessage(message)
+		}
+	}
+
+	/**
+	 * Sets the CliBridgeServer instance to enable broadcasting messages to CLI clients.
+	 * @param server The CliBridgeServer instance
+	 */
+	public setCliBridgeServer(server: any) {
+		this.cliBridgeServer = server
 	}
 
 	private async getHMRHtmlContent(webview: vscode.Webview): Promise<string> {
@@ -750,6 +764,16 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 		const onReceiveMessage = async (message: WebviewMessage) => webviewMessageHandler(this, message)
 
 		webview.onDidReceiveMessage(onReceiveMessage, null, this.disposables)
+	}
+
+	/**
+	 * Handles messages received from external sources (like the CLI Bridge)
+	 * by routing them to the standard message handler.
+	 * @param message The message received from the external source.
+	 */
+	public async handleExternalMessage(message: WebviewMessage): Promise<void> {
+		// Reuse the existing message handler logic
+		await webviewMessageHandler(this, message)
 	}
 
 	/**

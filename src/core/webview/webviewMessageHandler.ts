@@ -1214,6 +1214,58 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 				}
 			}
 			break
+		case "registerClientId":
+			try {
+				if (message.clientId && message.taskId) {
+					// Log the registration
+					provider.log(
+						`[WebviewMessageHandler] Received registerClientId for client ${message.clientId} and task ${message.taskId}`,
+					)
+
+					// Get the API instance from the extension's global API
+					const api = vscode.extensions.getExtension("mayalabs.roo-cline-with-cli")?.exports
+					if (api) {
+						// Register the client with the API
+						if (typeof api.registerWebSocketClientForTask === "function") {
+							api.registerWebSocketClientForTask(message.taskId, message.clientId)
+							provider.log(
+								`[WebviewMessageHandler] Registered client ${message.clientId} for task ${message.taskId} using API directly`,
+							)
+						} else {
+							provider.log(
+								`[WebviewMessageHandler] API.registerWebSocketClientForTask method not available`,
+							)
+						}
+					} else {
+						provider.log(`[WebviewMessageHandler] API not available, trying alternative registration`)
+
+						// Try to register through the extension's exports
+						const extension = vscode.extensions.getExtension("mayalabs.roo-cline-with-cli")
+						if (extension && extension.exports) {
+							provider.log(
+								`[WebviewMessageHandler] Extension exports available: ${Object.keys(extension.exports).join(", ")}`,
+							)
+						}
+					}
+
+					// Acknowledge the message with a valid action type
+					provider.postMessageToWebview({
+						type: "action",
+						action: "didBecomeVisible",
+						text: `Client ${message.clientId} registered for task ${message.taskId}`,
+					})
+
+					// Force a state update to ensure the client gets the latest state
+					await provider.postStateToWebview()
+				} else {
+					provider.log(
+						`[WebviewMessageHandler] Error: Missing clientId or taskId in registerClientId message`,
+					)
+				}
+			} catch (error) {
+				provider.log(`[WebviewMessageHandler] Error registering client: ${error}`)
+			}
+			break
 		case "getListApiConfiguration":
 			try {
 				const listApiConfig = await provider.providerSettingsManager.listConfig()
@@ -1305,7 +1357,6 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 				})
 			}
 			break
-
 		case "telemetrySetting": {
 			const telemetrySetting = message.text as TelemetrySetting
 			await updateGlobalState("telemetrySetting", telemetrySetting)

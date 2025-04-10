@@ -620,6 +620,13 @@ interface RooCodeAPI extends EventEmitter<RooCodeEvents> {
 	 * Returns true if the API is ready to use.
 	 */
 	isReady(): boolean
+	/**
+	 * Explicitly register a client ID for a task ID.
+	 * This is used by the CLI to ensure it receives messages for a task.
+	 * @param taskId The task ID to register the client for
+	 * @param clientId The client ID to register
+	 */
+	registerClientForTask(taskId: string, clientId: string): void
 }
 
 export {

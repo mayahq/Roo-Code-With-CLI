@@ -1,10 +1,19 @@
-import EventEmitter from "node:events"
-import { Socket } from "node:net"
 import * as crypto from "node:crypto"
+import EventEmitter from "node:events"
+import * as fs from "node:fs" // Import fs
+import { Socket } from "node:net"
 
 import ipc from "node-ipc"
 
-import { IpcOrigin, IpcMessageType, IpcMessage, ipcMessageSchema, TaskCommand, TaskEvent } from "../schemas/ipc"
+// Import corrected types from schema
+import {
+	CliCommand,
+	IpcMessage,
+	ipcMessageSchema,
+	IpcMessageType,
+	IpcOrigin, // Import CliCommandName
+	TaskEvent,
+} from "../schemas/ipc.js" // Use .js extension
 
 /**
  * IpcServer
@@ -13,7 +22,7 @@ import { IpcOrigin, IpcMessageType, IpcMessage, ipcMessageSchema, TaskCommand, T
 type IpcServerEvents = {
 	[IpcMessageType.Connect]: [clientId: string]
 	[IpcMessageType.Disconnect]: [clientId: string]
-	[IpcMessageType.TaskCommand]: [clientId: string, data: TaskCommand]
+	[IpcMessageType.CliCommand]: [clientId: string, data: CliCommand] // Use CliCommand type
 	[IpcMessageType.TaskEvent]: [relayClientId: string | undefined, data: TaskEvent]
 }
 
@@ -38,6 +47,15 @@ export class IpcServer extends EventEmitter<IpcServerEvents> {
 		ipc.config.silent = true
 
 		ipc.serve(this.socketPath, () => {
+			this.log(`[IpcServer] ipc.serve callback executed for ${this.socketPath}`)
+			// Set socket permissions after server starts listening
+			try {
+				fs.chmodSync(this.socketPath, 0o666)
+				this.log(`[IpcServer] Set permissions 666 on socket file: ${this.socketPath}`)
+			} catch (error) {
+				this.log(`[IpcServer] Failed to set permissions on socket file: ${error}`)
+			}
+
 			ipc.server.on("connect", (socket) => this.onConnect(socket))
 			ipc.server.on("socket.disconnected", (socket) => this.onDisconnect(socket))
 			ipc.server.on("message", (data) => this.onMessage(data))
@@ -51,6 +69,7 @@ export class IpcServer extends EventEmitter<IpcServerEvents> {
 		this._clients.set(clientId, socket)
 		this.log(`[server#onConnect] clientId = ${clientId}, # clients = ${this._clients.size}`)
 
+		this.log(`[server#onConnect] Sending Ack to clientId: ${clientId}`)
 		this.send(socket, {
 			type: IpcMessageType.Ack,
 			origin: IpcOrigin.Server,
@@ -95,8 +114,9 @@ export class IpcServer extends EventEmitter<IpcServerEvents> {
 
 		if (payload.origin === IpcOrigin.Client) {
 			switch (payload.type) {
-				case IpcMessageType.TaskCommand:
-					this.emit(IpcMessageType.TaskCommand, payload.clientId, payload.data)
+				case IpcMessageType.CliCommand: // Use CliCommand type
+					// Pass clientId along with the data when emitting
+					this.emit(IpcMessageType.CliCommand, payload.clientId, payload.data) // Use CliCommand type
 					break
 				default:
 					this.log(`[server#onMessage] unhandled payload: ${JSON.stringify(payload)}`)
@@ -110,13 +130,10 @@ export class IpcServer extends EventEmitter<IpcServerEvents> {
 	}
 
 	public broadcast(message: IpcMessage) {
-		// this.log("[server#broadcast] message =", message)
 		ipc.server.broadcast("message", message)
 	}
 
 	public send(client: string | Socket, message: IpcMessage) {
-		// this.log("[server#send] message =", message)
-
 		if (typeof client === "string") {
 			const socket = this._clients.get(client)
 
@@ -134,5 +151,13 @@ export class IpcServer extends EventEmitter<IpcServerEvents> {
 
 	public get isListening() {
 		return this._isListening
+	}
+
+	/**
+	 * Gets the list of connected client IDs.
+	 * @returns An array of client IDs.
+	 */
+	public getConnectedClients(): string[] {
+		return Array.from(this._clients.keys())
 	}
 }

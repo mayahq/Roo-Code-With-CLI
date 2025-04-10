@@ -7,15 +7,15 @@ const fs = require("fs")
 const path = require("path")
 const { execSync } = require("child_process")
 
-// Create the dist/roo-cli directory if it doesn't exist
-const cliDistDir = path.join(__dirname, "..", "dist", "roo-cli")
+// Create the dist/roocli directory if it doesn't exist
+const cliDistDir = path.join(__dirname, "..", "dist", "roocli")
 if (!fs.existsSync(cliDistDir)) {
-	console.log("Creating dist/roo-cli directory...")
+	console.log("Creating dist/roocli directory...")
 	fs.mkdirSync(cliDistDir, { recursive: true })
 }
 
 // Build the CLI if it hasn't been built yet
-const cliSrcDir = path.join(__dirname, "..", "roo-cli")
+const cliSrcDir = path.join(__dirname, "..", "roocli")
 if (fs.existsSync(cliSrcDir)) {
 	console.log("Building the CLI...")
 	try {
@@ -44,7 +44,7 @@ if (fs.existsSync(cliSrcDir)) {
 		process.chdir(path.join(__dirname, ".."))
 
 		// Copy the CLI files to the dist directory
-		console.log("Copying CLI files to dist/roo-cli...")
+		console.log("Copying CLI files to dist/roocli...")
 
 		// Clean the dist directory first
 		if (fs.existsSync(cliDistDir)) {
@@ -55,7 +55,7 @@ if (fs.existsSync(cliSrcDir)) {
 		// Copy the dist directory
 		const cliDistSrcDir = path.join(cliSrcDir, "dist")
 		if (fs.existsSync(cliDistSrcDir)) {
-			// Copy all files from roo-cli/dist to dist/roo-cli
+			// Copy all files from roocli/dist to dist/roocli
 			copyDirectory(cliDistSrcDir, cliDistDir)
 
 			// Copy package.json

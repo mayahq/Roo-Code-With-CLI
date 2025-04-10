@@ -1,5 +1,5 @@
 {
-	"name": "roo-code-with-cli",
+	"name": "roo-cline-with-cli",
 	"displayName": "Roo Code With CLI (prev. Roo Cline) With CLI",
 	"description": "A whole dev team of AI agents in your editor.",
 	"publisher": "mayalabs",
@@ -349,27 +349,13 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Enable the Roo Configuration Bridge server for CLI tool communication"
-				},
-				"roo.bridge.port": {
-					"type": "number",
-					"default": 30001,
-					"description": "Port for the Roo Configuration Bridge server"
-				},
-				"roo.bridge.secret": {
-					"type": "string",
-					"default": "",
-					"description": "Secret token for authenticating with the Roo Configuration Bridge server (recommended to store via VS Code secrets)"
 				}
 			}
-		},
-		"roo.bridge.enabled": {
-			"type": "boolean",
-			"default": true,
-			"description": "Enable the Roo Configuration Bridge for CLI tools"
 		}
 	},
 	"scripts": {
 		"build": "npm run prepare-cli && npm run vsix",
+		"build:docker": "npm run prepare-cli && npm run vsix --pre-release --out bin/roo-cline-with-cli.vsix",
 		"prepare-cli": "node scripts/prepare-cli.js",
 		"build:webview": "cd webview-ui && npm run build",
 		"build:esbuild": "node esbuild.js --production",
@@ -378,7 +364,7 @@
 		"install-extension": "npm install",
 		"install-webview": "cd webview-ui && npm install",
 		"install-e2e": "cd e2e && npm install",
-		"install-cli": "cd roo-cli && npm install",
+		"install-cli": "cd roocli && npm install",
 		"postinstall": "npm run install-cli",
 		"lint": "npm-run-all -l -p lint:*",
 		"lint:extension": "eslint src --ext ts",
@@ -388,9 +374,9 @@
 		"check-types:extension": "tsc --noEmit",
 		"check-types:webview": "cd webview-ui && npm run check-types",
 		"check-types:e2e": "cd e2e && npm run check-types",
-		"check-types:cli": "cd roo-cli && tsc --noEmit",
+		"check-types:cli": "cd roocli && tsc --noEmit",
 		"package": "npm-run-all -l -p build:webview build:esbuild check-types lint build:cli",
-		"build:cli": "cd roo-cli && npm install && npm run build",
+		"build:cli": "cd roocli && npm install && npm run build",
 		"pretest": "npm run compile",
 		"dev": "cd webview-ui && npm run dev",
 		"test": "node scripts/run-tests.js",
@@ -474,6 +460,7 @@
 		"tree-sitter-wasms": "^0.1.11",
 		"turndown": "^7.2.0",
 		"web-tree-sitter": "^0.22.6",
+		"ws": "^8.18.1",
 		"zod": "^3.23.8"
 	},
 	"devDependencies": {
@@ -488,6 +475,7 @@
 		"@types/node": "20.x",
 		"@types/node-ipc": "^9.2.3",
 		"@types/string-similarity": "^4.0.2",
+		"@types/ws": "^8.18.1",
 		"@typescript-eslint/eslint-plugin": "^7.14.1",
 		"@typescript-eslint/parser": "^7.11.0",
 		"@vscode/vsce": "^3.3.2",

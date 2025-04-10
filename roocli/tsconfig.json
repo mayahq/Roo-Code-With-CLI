@@ -1,0 +1,18 @@
+{
+	"compilerOptions": {
+		"target": "ES2020", // Use a modern ECMAScript target
+		"module": "CommonJS", // Standard module system for Node.js CLI
+		"outDir": "./dist", // Output directory for compiled JavaScript
+		"rootDir": "./src", // Root directory of source files
+		"strict": true, // Enable all strict type-checking options
+		"esModuleInterop": true, // Enables compatibility with CommonJS modules
+		"skipLibCheck": true, // Skip type checking of declaration files
+		"forceConsistentCasingInFileNames": true, // Disallow inconsistently-cased references
+		"resolveJsonModule": true, // Allow importing JSON files
+		"moduleResolution": "node", // Use Node.js module resolution strategy
+		"declaration": true, // Generate corresponding '.d.ts' files
+		"sourceMap": true // Generate source maps for debugging
+	},
+	"include": ["src/**/*"], // Include all files in the src directory
+	"exclude": ["node_modules", "dist"] // Exclude node_modules and the output directory
+}

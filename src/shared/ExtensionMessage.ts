@@ -1,20 +1,20 @@
 import {
-	ModelInfo,
-	GlobalSettings,
 	ApiConfigMeta,
 	ProviderSettings as ApiConfiguration,
+	CheckpointStorage,
+	ClineAsk,
+	ClineMessage,
+	ClineSay,
+	ExperimentId,
+	GlobalSettings,
 	HistoryItem,
 	ModeConfig,
-	CheckpointStorage,
+	ModelInfo,
 	TelemetrySetting,
-	ExperimentId,
-	ClineAsk,
-	ClineSay,
 	ToolProgressStatus,
-	ClineMessage,
 } from "../schemas"
-import { McpServer } from "./mcp"
 import { GitCommit } from "../utils/git"
+import { McpServer } from "./mcp"
 import { Mode } from "./modes"
 
 export type { ApiConfigMeta, ToolProgressStatus }
@@ -69,6 +69,8 @@ export interface ExtensionMessage {
 		| "maxReadFileLine"
 		| "fileSearchResults"
 		| "toggleApiConfigPin"
+		| "clientId"
+		| "taskCreated"
 	text?: string
 	action?:
 		| "chatButtonClicked"
@@ -78,6 +80,7 @@ export interface ExtensionMessage {
 		| "promptsButtonClicked"
 		| "didBecomeVisible"
 		| "focusInput"
+		| "welcome"
 	invoke?: "newChat" | "sendMessage" | "primaryButtonClick" | "secondaryButtonClick" | "setChatBoxMessage"
 	state?: ExtensionState
 	images?: string[]
@@ -112,6 +115,8 @@ export interface ExtensionMessage {
 		label?: string
 	}>
 	error?: string
+	clientId?: string
+	taskId?: string
 }
 
 export type ExtensionState = Pick<
@@ -206,7 +211,7 @@ export type ExtensionState = Pick<
 	settingsImportedAt?: number
 }
 
-export type { ClineMessage, ClineAsk, ClineSay }
+export type { ClineAsk, ClineMessage, ClineSay }
 
 export interface ClineSayTool {
 	tool:

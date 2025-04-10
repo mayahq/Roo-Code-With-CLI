@@ -58,7 +58,7 @@ import { DiffStrategy, getDiffStrategy } from "./diff/DiffStrategy"
 import { RooIgnoreController } from "./ignore/RooIgnoreController"
 import { parseMentions } from "./mentions"
 import { isToolAllowedForMode, ToolName, validateToolUse } from "./mode-validator"
-import { formatResponse } from "./prompts/responses"
+import { formatResponse } from "./prompts/responses" // Import formatResponse
 import { SYSTEM_PROMPT } from "./prompts/system"
 import { truncateConversationIfNeeded } from "./sliding-window"
 import { accessMcpResourceTool } from "./tools/accessMcpResourceTool"
@@ -898,6 +898,45 @@ export class Cline extends EventEmitter<ClineEvents> {
 				this.consecutiveMistakeCount++
 			}
 		}
+	}
+
+	/**
+	 * Processes subsequent user input received via IPC or other external sources.
+	 * Waits for the current processing loop iteration to finish before injecting the new input.
+	 */
+	public async processUserInput(text: string, images?: string[]): Promise<void> {
+		this.providerRef.deref()?.log(`[Cline] Received user input: "${text}"`)
+
+		// Wait for the current loop iteration (API request/tool execution) to finish
+		try {
+			await pWaitFor(() => !this.isStreaming && !this.isPaused && !this.isWaitingForFirstChunk, {
+				timeout: 30000, // 30 seconds timeout
+			})
+		} catch (error) {
+			this.providerRef
+				.deref()
+				?.log(`[Cline] Timeout waiting for Cline to become idle before processing user input.`)
+			throw new Error("Cline instance is busy and could not process new input.")
+		}
+
+		// Check if the task was aborted while waiting
+		if (this.abort) {
+			this.providerRef.deref()?.log(`[Cline] Task aborted while waiting to process user input.`)
+			throw new Error("Task was aborted.")
+		}
+
+		// Add the user message to the UI history
+		await this.say("user_feedback", text, images)
+
+		// Format the input for the API
+		const userContent: UserContent = [{ type: "text", text }]
+		if (images && images.length > 0) {
+			userContent.push(...formatResponse.imageBlocks(images))
+		}
+
+		// Restart the processing loop with the new user input
+		// We use recursivelyMakeClineRequests directly as the task is already initialized
+		await this.recursivelyMakeClineRequests(userContent)
 	}
 
 	async abortTask(isAbandoned = false) {

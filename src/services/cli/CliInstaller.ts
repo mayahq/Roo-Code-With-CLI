@@ -25,7 +25,7 @@ export class CliInstaller {
 			this.outputChannel.appendLine("Installing Roo CLI...")
 
 			// Path to the CLI directory within the extension
-			const cliDistPath = path.join(this.extensionPath, "dist", "roo-cli")
+			const cliDistPath = path.join(this.extensionPath, "dist", "roocli")
 
 			// Check if the CLI directory exists
 			if (!fs.existsSync(cliDistPath)) {
@@ -45,11 +45,11 @@ export class CliInstaller {
 
 			// Create a package.json file in the temporary directory
 			const packageJson = {
-				name: "roo-cli",
+				name: "roo",
 				version: this.getExtensionVersion(),
 				description: "Command Line Interface for Roo",
 				main: "cli.js",
-				type: "module",
+				// Removed "type": "module" to allow CommonJS syntax
 				bin: {
 					roo: "cli.js",
 					"roo-config": "ipc-bridge-cli/index.js",
@@ -89,7 +89,7 @@ export class CliInstaller {
 			this.outputChannel.appendLine("Uninstalling Roo CLI...")
 
 			// Uninstall the CLI globally
-			await this.executeCommand("npm", ["uninstall", "-g", "roo-cli"], {})
+			await this.executeCommand("npm", ["uninstall", "-g", "roo"], {})
 				.then(() => {
 					this.isInstalled = false
 					this.outputChannel.appendLine("Roo CLI uninstalled successfully")

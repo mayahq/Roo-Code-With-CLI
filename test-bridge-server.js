@@ -1,243 +1,127 @@
-const http = require("http")
+const fs = require("fs")
+const path = require("path")
+const os = require("os")
+const { WebSocketServer } = require("ws")
 
-// Mock provider settings
-const providerProfiles = {
-	currentApiConfigName: "default",
-	apiConfigs: {
-		default: {
-			id: "default-id",
-			apiProvider: "openai",
-		},
-		"test-profile": {
-			id: "test-id",
-			apiProvider: "anthropic",
-		},
-	},
-	modeApiConfigs: {
-		code: "default-id",
-		debug: "test-id",
-	},
-}
+// Create a WebSocket server
+const wss = new WebSocketServer({ port: 0 })
 
-// Create HTTP server
-const server = http.createServer((req, res) => {
-	console.log(`${req.method} ${req.url}`)
+// Get the port number
+wss.on("listening", () => {
+	const address = wss.address()
+	const port = address.port
+	console.log(`WebSocket server listening on port ${port}`)
 
-	// Set CORS headers
-	res.setHeader("Access-Control-Allow-Origin", "*")
-	res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-	res.setHeader("Access-Control-Allow-Headers", "Content-Type, X-Roo-Bridge-Secret")
-
-	// Handle preflight requests
-	if (req.method === "OPTIONS") {
-		res.writeHead(204)
-		res.end()
-		return
+	// Determine the storage path based on the platform
+	let storagePath
+	if (process.platform === "win32") {
+		storagePath = path.join(
+			os.homedir(),
+			"AppData",
+			"Roaming",
+			"Code",
+			"User",
+			"globalStorage",
+			"mayahq.roo-cline-with-cli",
+		)
+	} else if (process.platform === "darwin") {
+		storagePath = path.join(
+			os.homedir(),
+			"Library",
+			"Application Support",
+			"Code",
+			"User",
+			"globalStorage",
+			"mayahq.roo-cline-with-cli",
+		)
+	} else {
+		storagePath = path.join(os.homedir(), ".config", "Code", "User", "globalStorage", "mayahq.roo-cline-with-cli")
 	}
 
-	// Parse URL
-	const url = new URL(req.url, `http://localhost:30001`)
-	const path = url.pathname
-
-	// Handle request based on path and method
-	if (path === "/config/list" && req.method === "GET") {
-		// List configs
-		const configs = Object.entries(providerProfiles.apiConfigs).map(([name, config]) => ({
-			name,
-			id: config.id,
-			apiProvider: config.apiProvider,
-		}))
-
-		res.writeHead(200, { "Content-Type": "application/json" })
-		res.end(JSON.stringify({ configs }))
-		return
+	// Create the directory if it doesn't exist
+	if (!fs.existsSync(storagePath)) {
+		fs.mkdirSync(storagePath, { recursive: true })
 	}
 
-	if (path === "/config/save" && req.method === "POST") {
-		// Parse request body
-		let body = ""
-		req.on("data", (chunk) => {
-			body += chunk.toString()
-		})
+	// Write the port number to the port file
+	const portFilePath = path.join(storagePath, "roo_cli_bridge.port")
+	fs.writeFileSync(portFilePath, JSON.stringify({ port }))
+	console.log(`Port file written to: ${portFilePath}`)
 
-		req.on("end", () => {
+	// Handle connections
+	wss.on("connection", (ws) => {
+		console.log("Client connected")
+
+		// Handle messages from the client
+		ws.on("message", (message) => {
 			try {
-				const { name, config } = JSON.parse(body)
+				const parsedMessage = JSON.parse(message)
+				console.log("Received message:", parsedMessage)
 
-				if (!name || !config) {
-					res.writeHead(400, { "Content-Type": "application/json" })
-					res.end(JSON.stringify({ error: "Missing required parameters: name and config" }))
-					return
+				// Send a response back to the client
+				if (parsedMessage.type === "newTask") {
+					// Send a partial message
+					ws.send(
+						JSON.stringify({
+							type: "partialMessage",
+							partialMessage: {
+								type: "say",
+								say: "ai_response",
+								content: "Hello from the test server! I received your message: " + parsedMessage.text,
+							},
+						}),
+					)
+
+					// Send a state update
+					setTimeout(() => {
+						ws.send(
+							JSON.stringify({
+								type: "state",
+								state: {
+									clineMessages: [
+										{
+											type: "say",
+											say: "ai_response",
+											content:
+												"Hello from the test server! I received your message: " +
+												parsedMessage.text,
+										},
+									],
+								},
+							}),
+						)
+					}, 1000)
 				}
-
-				// Save config
-				providerProfiles.apiConfigs[name] = {
-					...config,
-					id: config.id || `${name}-${Date.now()}`,
-				}
-
-				res.writeHead(200, { "Content-Type": "application/json" })
-				res.end(JSON.stringify({ success: true }))
 			} catch (error) {
-				res.writeHead(400, { "Content-Type": "application/json" })
-				res.end(JSON.stringify({ error: error.message }))
+				console.error("Error parsing message:", error)
 			}
 		})
 
-		return
-	}
-
-	if (path === "/config/load" && req.method === "POST") {
-		// Parse request body
-		let body = ""
-		req.on("data", (chunk) => {
-			body += chunk.toString()
+		// Handle disconnection
+		ws.on("close", () => {
+			console.log("Client disconnected")
 		})
+	})
 
-		req.on("end", () => {
-			try {
-				const { name } = JSON.parse(body)
+	// Handle errors
+	wss.on("error", (error) => {
+		console.error("WebSocket server error:", error)
+	})
 
-				if (!name) {
-					res.writeHead(400, { "Content-Type": "application/json" })
-					res.end(JSON.stringify({ error: "Missing required parameter: name" }))
-					return
-				}
-
-				// Check if config exists
-				if (!providerProfiles.apiConfigs[name]) {
-					res.writeHead(404, { "Content-Type": "application/json" })
-					res.end(JSON.stringify({ error: `Config '${name}' not found` }))
-					return
-				}
-
-				// Load config
-				providerProfiles.currentApiConfigName = name
-
-				res.writeHead(200, { "Content-Type": "application/json" })
-				res.end(
-					JSON.stringify({
-						success: true,
-						config: providerProfiles.apiConfigs[name],
-					}),
-				)
-			} catch (error) {
-				res.writeHead(400, { "Content-Type": "application/json" })
-				res.end(JSON.stringify({ error: error.message }))
-			}
-		})
-
-		return
-	}
-
-	if (path === "/config/delete" && req.method === "POST") {
-		// Parse request body
-		let body = ""
-		req.on("data", (chunk) => {
-			body += chunk.toString()
-		})
-
-		req.on("end", () => {
-			try {
-				const { name } = JSON.parse(body)
-
-				if (!name) {
-					res.writeHead(400, { "Content-Type": "application/json" })
-					res.end(JSON.stringify({ error: "Missing required parameter: name" }))
-					return
-				}
-
-				// Check if config exists
-				if (!providerProfiles.apiConfigs[name]) {
-					res.writeHead(404, { "Content-Type": "application/json" })
-					res.end(JSON.stringify({ error: `Config '${name}' not found` }))
-					return
-				}
-
-				// Check if it's the last config
-				if (Object.keys(providerProfiles.apiConfigs).length <= 1) {
-					res.writeHead(400, { "Content-Type": "application/json" })
-					res.end(JSON.stringify({ error: "Cannot delete the last remaining configuration" }))
-					return
-				}
-
-				// Delete config
-				delete providerProfiles.apiConfigs[name]
-
-				// Reset current config if needed
-				if (providerProfiles.currentApiConfigName === name) {
-					providerProfiles.currentApiConfigName = Object.keys(providerProfiles.apiConfigs)[0]
-				}
-
-				res.writeHead(200, { "Content-Type": "application/json" })
-				res.end(JSON.stringify({ success: true }))
-			} catch (error) {
-				res.writeHead(400, { "Content-Type": "application/json" })
-				res.end(JSON.stringify({ error: error.message }))
-			}
-		})
-
-		return
-	}
-
-	if (path === "/config/setMode" && req.method === "POST") {
-		// Parse request body
-		let body = ""
-		req.on("data", (chunk) => {
-			body += chunk.toString()
-		})
-
-		req.on("end", () => {
-			try {
-				const { mode, configId } = JSON.parse(body)
-
-				if (!mode || !configId) {
-					res.writeHead(400, { "Content-Type": "application/json" })
-					res.end(JSON.stringify({ error: "Missing required parameters: mode and configId" }))
-					return
-				}
-
-				// Set mode config
-				providerProfiles.modeApiConfigs[mode] = configId
-
-				res.writeHead(200, { "Content-Type": "application/json" })
-				res.end(JSON.stringify({ success: true }))
-			} catch (error) {
-				res.writeHead(400, { "Content-Type": "application/json" })
-				res.end(JSON.stringify({ error: error.message }))
-			}
-		})
-
-		return
-	}
-
-	if (path === "/config/getMode" && req.method === "GET") {
-		// Get query parameters
-		const mode = url.searchParams.get("mode")
-
-		if (!mode) {
-			res.writeHead(400, { "Content-Type": "application/json" })
-			res.end(JSON.stringify({ error: "Missing required parameter: mode" }))
-			return
+	// Handle process termination
+	process.on("SIGINT", () => {
+		console.log("Shutting down...")
+		// Remove the port file
+		try {
+			fs.unlinkSync(portFilePath)
+			console.log("Port file removed")
+		} catch (error) {
+			console.error("Error removing port file:", error)
 		}
-
-		// Get mode config
-		const configId = providerProfiles.modeApiConfigs[mode]
-
-		res.writeHead(200, { "Content-Type": "application/json" })
-		res.end(JSON.stringify({ configId }))
-		return
-	}
-
-	// Default: Not found
-	res.writeHead(404, { "Content-Type": "application/json" })
-	res.end(JSON.stringify({ error: "Not found" }))
+		// Close the server
+		wss.close(() => {
+			console.log("Server closed")
+			process.exit(0)
+		})
+	})
 })
-
-// Start server
-const PORT = 30001
-server.listen(PORT, "127.0.0.1", () => {
-	console.log(`Test bridge server running at http://localhost:${PORT}`)
-})
-
-console.log("Press Ctrl+C to stop the server")

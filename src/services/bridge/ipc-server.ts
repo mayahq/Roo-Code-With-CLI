@@ -17,7 +17,7 @@ export class ConfigBridgeServer {
 	private isRunning: boolean = false
 
 	// IPC server ID
-	private static readonly SERVER_ID = "roo-config-bridge"
+	private static readonly SERVER_ID = "roo-config-bridge" // Original ID
 
 	// Socket path
 	private static getSocketPath(): string {
@@ -65,21 +65,26 @@ export class ConfigBridgeServer {
 				// Set socket permissions to 666 (read/write for all users)
 				try {
 					fs.chmodSync(socketPath, 0o666)
-					this.outputChannel.appendLine(`Set permissions 666 on socket file: ${socketPath}`)
+					this.outputChannel.appendLine(`[ConfigBridge] Set permissions 666 on socket file: ${socketPath}`) // Log context
 				} catch (error) {
-					this.outputChannel.appendLine(`Failed to set permissions on socket file: ${error}`)
+					this.outputChannel.appendLine(`[ConfigBridge] Failed to set permissions on socket file: ${error}`)
 				}
 
 				this.outputChannel.appendLine(`Roo Configuration Bridge IPC server started at ${socketPath}`)
 				this.isRunning = true
 
-				// Handle messages
+				// Handle messages (Original simple structure)
 				ipc.server.on("message", async (data: string, socket) => {
 					try {
 						const message = JSON.parse(data)
+						// Expecting { command: string, params: any }
 						const { command, params } = message
 
-						this.outputChannel.appendLine(`Received command: ${command}`)
+						if (!command || typeof command !== "string") {
+							throw new Error("Invalid message format: Missing or invalid 'command'")
+						}
+
+						this.outputChannel.appendLine(`[ConfigBridge] Received command: ${command}`)
 
 						let response: any
 
@@ -87,27 +92,21 @@ export class ConfigBridgeServer {
 							case "list":
 								response = await this.handleListConfig()
 								break
-
 							case "save":
 								response = await this.handleSaveConfig(params)
 								break
-
 							case "load":
 								response = await this.handleLoadConfig(params)
 								break
-
 							case "delete":
 								response = await this.handleDeleteConfig(params)
 								break
-
 							case "setMode":
 								response = await this.handleSetModeConfig(params)
 								break
-
 							case "getMode":
 								response = await this.handleGetModeConfig(params)
 								break
-
 							default:
 								response = { error: `Unknown command: ${command}` }
 						}
@@ -115,7 +114,7 @@ export class ConfigBridgeServer {
 						// Send response back to client
 						ipc.server.emit(socket, "message", JSON.stringify(response))
 					} catch (error) {
-						this.outputChannel.appendLine(`Error handling message: ${error}`)
+						this.outputChannel.appendLine(`[ConfigBridge] Error handling message: ${error}`)
 						telemetryService.captureEvent("Bridge Server Error", { error: String(error) })
 
 						// Send error response
@@ -127,6 +126,19 @@ export class ConfigBridgeServer {
 							}),
 						)
 					}
+				})
+
+				ipc.server.on("connect", (socket) => {
+					this.outputChannel.appendLine(`[ConfigBridge] Client connected.`)
+					// No Ack needed for this simple server
+				})
+
+				ipc.server.on("socket.disconnected", (socket, destroyedSocketID) => {
+					this.outputChannel.appendLine(`[ConfigBridge] Client disconnected: ${destroyedSocketID}`)
+				})
+
+				ipc.server.on("error", (err) => {
+					this.outputChannel.appendLine(`[ConfigBridge] Server error: ${err}`)
 				})
 			})
 
@@ -149,9 +161,7 @@ export class ConfigBridgeServer {
 		}
 	}
 
-	/**
-	 * Handle list config command
-	 */
+	// --- Config Command Handlers (Original) ---
 	private async handleListConfig(): Promise<any> {
 		try {
 			const configs = await this.providerSettingsManager.listConfig()
@@ -161,17 +171,10 @@ export class ConfigBridgeServer {
 		}
 	}
 
-	/**
-	 * Handle save config command
-	 */
 	private async handleSaveConfig(params: any): Promise<any> {
 		try {
 			const { name, config } = params
-
-			if (!name || !config) {
-				return { error: "Missing required parameters: name and config" }
-			}
-
+			if (!name || !config) return { error: "Missing required parameters: name and config" }
 			await this.providerSettingsManager.saveConfig(name, config)
 			return { success: true }
 		} catch (error) {
@@ -179,17 +182,10 @@ export class ConfigBridgeServer {
 		}
 	}
 
-	/**
-	 * Handle load config command
-	 */
 	private async handleLoadConfig(params: any): Promise<any> {
 		try {
 			const { name } = params
-
-			if (!name) {
-				return { error: "Missing required parameter: name" }
-			}
-
+			if (!name) return { error: "Missing required parameter: name" }
 			const config = await this.providerSettingsManager.loadConfig(name)
 			return { success: true, config }
 		} catch (error) {
@@ -197,17 +193,10 @@ export class ConfigBridgeServer {
 		}
 	}
 
-	/**
-	 * Handle delete config command
-	 */
 	private async handleDeleteConfig(params: any): Promise<any> {
 		try {
 			const { name } = params
-
-			if (!name) {
-				return { error: "Missing required parameter: name" }
-			}
-
+			if (!name) return { error: "Missing required parameter: name" }
 			await this.providerSettingsManager.deleteConfig(name)
 			return { success: true }
 		} catch (error) {
@@ -215,17 +204,10 @@ export class ConfigBridgeServer {
 		}
 	}
 
-	/**
-	 * Handle set mode config command
-	 */
 	private async handleSetModeConfig(params: any): Promise<any> {
 		try {
 			const { mode, configId } = params
-
-			if (!mode || !configId) {
-				return { error: "Missing required parameters: mode and configId" }
-			}
-
+			if (!mode || !configId) return { error: "Missing required parameters: mode and configId" }
 			await this.providerSettingsManager.setModeConfig(mode, configId)
 			return { success: true }
 		} catch (error) {
@@ -233,17 +215,10 @@ export class ConfigBridgeServer {
 		}
 	}
 
-	/**
-	 * Handle get mode config command
-	 */
 	private async handleGetModeConfig(params: any): Promise<any> {
 		try {
 			const { mode } = params
-
-			if (!mode) {
-				return { error: "Missing required parameter: mode" }
-			}
-
+			if (!mode) return { error: "Missing required parameter: mode" }
 			const configId = await this.providerSettingsManager.getModeConfigId(mode)
 			return { configId }
 		} catch (error) {

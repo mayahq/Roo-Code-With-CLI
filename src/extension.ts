@@ -1,4 +1,5 @@
 import * as dotenvx from "@dotenvx/dotenvx"
+import * as os from "os" // Added os import
 import * as path from "path"
 import * as vscode from "vscode"
 
@@ -20,8 +21,9 @@ import { API } from "./exports/api"
 import { initializeI18n } from "./i18n"
 import { DIFF_VIEW_URI_SCHEME } from "./integrations/editor/DiffViewProvider"
 import { TerminalRegistry } from "./integrations/terminal/TerminalRegistry"
-import { ConfigBridgeServer } from "./services/bridge/ipc-server"
+import { ConfigBridgeServer } from "./services/bridge/ipc-server" // Use ConfigBridgeServer
 import { CliInstaller } from "./services/cli/CliInstaller"
+import { CliBridgeServer } from "./services/ipc/CliBridgeServer" // Import the new server
 import { McpServerManager } from "./services/mcp/McpServerManager"
 import { telemetryService } from "./services/telemetry/TelemetryService"
 import { migrateSettings } from "./utils/migrateSettings"
@@ -39,7 +41,8 @@ import { formatLanguage } from "./shared/language"
 
 let outputChannel: vscode.OutputChannel
 let extensionContext: vscode.ExtensionContext
-let configBridgeServer: ConfigBridgeServer
+let configBridgeServer: ConfigBridgeServer // Use ConfigBridgeServer type
+let cliBridgeServer: CliBridgeServer // Declare the new server variable
 let cliInstaller: CliInstaller
 
 // This method is called when your extension is activated.
@@ -76,8 +79,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	// Initialize and start the configuration bridge server
 	configBridgeServer = new ConfigBridgeServer(context, provider.providerSettingsManager, outputChannel)
-	configBridgeServer.start().catch((error) => {
-		outputChannel.appendLine(`Failed to start Roo Configuration Bridge: ${error}`)
+	configBridgeServer.start().catch((error: Error) => {
+		// Add type to error
+		outputChannel.appendLine(`Failed to start Roo Configuration Bridge: ${error.message}`)
 	})
 
 	// Initialize and install the CLI
@@ -85,6 +89,15 @@ export async function activate(context: vscode.ExtensionContext) {
 	cliInstaller.installCli().catch((error) => {
 		outputChannel.appendLine(`Failed to install Roo CLI: ${error}`)
 	})
+
+	// Initialize and start the CLI Bridge server
+	cliBridgeServer = new CliBridgeServer(context, provider)
+	cliBridgeServer.start().catch((error: Error) => {
+		outputChannel.appendLine(`Failed to start Roo CLI Bridge: ${error.message}`)
+	})
+
+	// Connect the CliBridgeServer to the ClineProvider for message broadcasting
+	provider.setCliBridgeServer(cliBridgeServer)
 
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider(ClineProvider.sideBarId, provider, {
@@ -95,20 +108,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	registerCommands({ context, outputChannel, provider })
 
 	/**
-	 * We use the text document content provider API to show the left side for diff
-	 * view by creating a virtual document for the original content. This makes it
-	 * readonly so users know to edit the right side if they want to keep their changes.
-	 *
-	 * This API allows you to create readonly documents in VSCode from arbitrary
-	 * sources, and works by claiming an uri-scheme for which your provider then
-	 * returns text contents. The scheme must be provided when registering a
-	 * provider and cannot change afterwards.
-	 *
-	 * Note how the provider doesn't create uris for virtual documents - its role
-	 * is to provide contents given such an uri. In return, content providers are
-	 * wired into the open document logic so that providers are always considered.
-	 *
-	 * https://code.visualstudio.com/api/extension-guides/virtual-documents
+	 * Diff View Content Provider Setup
 	 */
 	const diffContentProvider = new (class implements vscode.TextDocumentContentProvider {
 		provideTextDocumentContent(uri: vscode.Uri): string {
@@ -135,10 +135,40 @@ export async function activate(context: vscode.ExtensionContext) {
 	// Allows other extensions to activate once Roo is ready.
 	vscode.commands.executeCommand("roo-cline-with-cli.activationCompleted")
 
-	// Implements the `RooCodeAPI` interface.
-	const socketPath = process.env.ROO_CODE_IPC_SOCKET_PATH
-	const enableLogging = typeof socketPath === "string"
-	return new API(outputChannel, provider, socketPath, enableLogging)
+	// Implements the `RooCodeAPI` interface and starts the IpcServer for tasks.
+	const getDefaultTaskSocketPath = (): string => {
+		const tmpDir = os.tmpdir()
+		// Use a distinct name for this task-oriented IPC bridge
+		return path.join(tmpDir, `roo-task-bridge.sock`) // Keep task bridge name
+	}
+
+	const envSocketPath = process.env.ROO_CODE_IPC_SOCKET_PATH
+	const socketPath = envSocketPath || getDefaultTaskSocketPath()
+	// Enable logging if the socket path is explicitly set via env or if we are using the default path
+	const enableLogging = typeof envSocketPath === "string" || !envSocketPath
+
+	if (enableLogging) {
+		outputChannel.appendLine(`[API] Starting IpcServer on socket: ${socketPath}`)
+	}
+
+	// Instantiate API with its own IpcServer
+	const api = new API(outputChannel, provider, socketPath, enableLogging) // Pass socketPath and enableLogging
+
+	// Connect the CliBridgeServer to the API instance for client registration
+	cliBridgeServer.setApiInstance(api)
+
+	// Create an exports object that includes both the API and the CliBridgeServer
+	const exports = {
+		...api,
+		cliBridgeServer,
+		// Add a direct method to register WebSocket clients
+		registerWebSocketClientForTask: (taskId: string, clientId: string) => {
+			outputChannel.appendLine(`[API Export] Registering WebSocket client ${clientId} for task ${taskId}`)
+			api.registerWebSocketClientForTask(taskId, clientId)
+		},
+	}
+
+	return exports
 }
 
 // This method is called when your extension is deactivated
@@ -152,7 +182,10 @@ export async function deactivate() {
 	TerminalRegistry.cleanup()
 
 	// Stop the configuration bridge server
-	configBridgeServer?.stop()
+	await configBridgeServer?.stop() // Stop the config bridge
+
+	// Stop the CLI bridge server
+	await cliBridgeServer?.stop() // Stop the CLI bridge
 
 	// Uninstall the CLI
 	try {
@@ -160,4 +193,5 @@ export async function deactivate() {
 	} catch (error) {
 		outputChannel.appendLine(`Failed to uninstall Roo CLI: ${error}`)
 	}
+	// API's internal IpcServer should stop automatically or via API disposal if implemented
 }

@@ -1,6 +1,6 @@
 import { z } from "zod"
-import { ApiConfiguration, ApiProvider } from "./api"
-import { Mode, PromptComponent, ModeConfig } from "./modes"
+import { ApiConfiguration } from "./api"
+import { Mode, ModeConfig, PromptComponent } from "./modes"
 
 export type ClineAskResponse = "yesButtonClicked" | "noButtonClicked" | "messageResponse"
 
@@ -37,6 +37,7 @@ export interface WebviewMessage {
 		| "showTaskWithId"
 		| "deleteTaskWithId"
 		| "exportTaskWithId"
+		| "registerClientId"
 		| "importSettings"
 		| "exportSettings"
 		| "resetState"
@@ -121,6 +122,7 @@ export interface WebviewMessage {
 		| "maxReadFileLine"
 		| "searchFiles"
 		| "toggleApiConfigPin"
+		| "registerClientIdResponse"
 	text?: string
 	disabled?: boolean
 	askResponse?: ClineAskResponse
@@ -146,6 +148,8 @@ export interface WebviewMessage {
 	source?: "global" | "project"
 	requestId?: string
 	ids?: string[]
+	clientId?: string
+	taskId?: string
 }
 
 export const checkoutDiffPayloadSchema = z.object({

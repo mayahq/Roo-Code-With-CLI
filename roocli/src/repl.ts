@@ -12,6 +12,8 @@ export class Repl {
 	private currentStreamedMessage = ""
 	private isExiting = false
 	private currentTaskId: string | null = null
+	private hasDisplayedPrefix = false // Track whether we've displayed the "Roo: " prefix
+	private lastMessageId: string | null = null // Track the last message ID to avoid duplicates
 
 	constructor(ipcClient: IpcClient) {
 		this.ipcClient = ipcClient
@@ -57,6 +59,7 @@ export class Repl {
 				display.log("\n\nInterrupted streaming.")
 				this.isStreaming = false
 				this.currentStreamedMessage = ""
+				this.hasDisplayedPrefix = false
 				this.rl.prompt()
 			} else {
 				// Otherwise, exit the REPL
@@ -167,17 +170,13 @@ export class Repl {
 			const clientId = this.ipcClient.getClientId()
 
 			if (!clientId) {
-				display.debug("No client ID available. Waiting for server to assign one...")
 				// Wait a short time for the client ID to be assigned if it's not available yet
 				await new Promise((resolve) => setTimeout(resolve, 500))
 			}
 
 			// Always check if we have a current task ID
 			if (this.currentTaskId) {
-				display.debug(`Continuing with existing session ID: ${this.currentTaskId}`)
-
 				const clientId = this.ipcClient.getClientId()
-				display.info(`Sending message with client ID: ${clientId || "none"}, task ID: ${this.currentTaskId}`)
 
 				// Send message to VS Code extension with client ID and task ID
 				// Don't await this message to avoid hanging
@@ -207,9 +206,9 @@ export class Repl {
 						})
 				}
 
-				display.debug(`Sent sendMessage with client ID: ${clientId || "none"}, task ID: ${this.currentTaskId}`)
+				// Message sent successfully
 			} else {
-				display.debug("Starting new task...")
+				// Starting new task
 
 				// Send message to VS Code extension with client ID
 				// Don't await this message to avoid hanging
@@ -224,13 +223,13 @@ export class Repl {
 						this.rl.prompt()
 						return
 					})
-
-				display.debug(`Sent newTask with client ID: ${this.ipcClient.getClientId() || "none"}`)
 			}
 
 			// Start streaming indicator
 			this.isStreaming = true
 			this.currentStreamedMessage = ""
+			this.hasDisplayedPrefix = false // Reset the prefix flag for a new message
+			this.lastMessageId = null // Reset the last message ID
 
 			// Don't prompt until we get a response
 		} catch (error) {
@@ -240,10 +239,48 @@ export class Repl {
 	}
 
 	/**
+	 * Generates a simple hash for a message to detect duplicates
+	 * @param content The message content to hash
+	 * @returns A string hash of the message
+	 */
+	private generateMessageId(content: string): string {
+		// Simple hash function for strings
+		let hash = 0
+		if (content.length === 0) return hash.toString()
+
+		for (let i = 0; i < content.length; i++) {
+			const char = content.charCodeAt(i)
+			hash = (hash << 5) - hash + char
+			hash = hash & hash // Convert to 32bit integer
+		}
+
+		return hash.toString()
+	}
+
+	/**
+	 * Checks if a message is a duplicate of the last message
+	 * @param content The message content to check
+	 * @returns True if the message is a duplicate, false otherwise
+	 */
+	private isDuplicateMessage(content: string): boolean {
+		if (!content) return false
+
+		const messageId = this.generateMessageId(content)
+		const isDuplicate = messageId === this.lastMessageId
+
+		// Update the last message ID
+		this.lastMessageId = messageId
+
+		return isDuplicate
+	}
+
+	/**
 	 * Handles a message from the IPC client.
 	 * @param message The message from the IPC client.
 	 */
 	private async handleIpcMessage(message: any): Promise<void> {
+		// Debug logs are handled by the display class which checks verbose mode internally
+
 		switch (message.type) {
 			case "partialMessage":
 				this.handlePartialMessage(message)
@@ -254,6 +291,9 @@ export class Repl {
 			case "action":
 				this.handleAction(message)
 				break
+			case "taskEvent":
+				this.handleTaskEvent(message)
+				break
 			case "taskCreated":
 				// Store the task ID for this session
 				if (message.taskId) {
@@ -263,7 +303,6 @@ export class Repl {
 					// Register this client ID with the task ID
 					const clientId = this.ipcClient.getClientId()
 					if (clientId) {
-						display.debug(`Registering client ID ${clientId} for task ${message.taskId}`)
 						// Send a special registerClientId message to ensure the mapping is set
 						// Don't await this message to avoid hanging
 						this.ipcClient
@@ -273,11 +312,8 @@ export class Repl {
 								taskId: message.taskId,
 							})
 							.catch((error) => {
-								display.debug(`Error registering client ID: ${error}`)
+								// Error handled silently
 							})
-
-						// Also log the registration attempt
-						display.info(`Registering client ID ${clientId} for task ${message.taskId}`)
 					}
 				}
 				break
@@ -285,11 +321,10 @@ export class Repl {
 				// Update the client ID if provided by the server
 				if (message.clientId) {
 					this.ipcClient.setClientId(message.clientId)
-					display.debug(`Using server-provided client ID: ${message.clientId}`)
 				}
 				break
 			default:
-				display.debug(`Received message of type: ${message.type}`)
+				// Ignore other message types
 				break
 		}
 	}
@@ -299,20 +334,36 @@ export class Repl {
 	 * @param message The partial message.
 	 */
 	private handlePartialMessage(message: any): void {
+		// Debug logs are handled by the display class which checks verbose mode internally
+
+		// Only initialize streaming if we're not already streaming
+		// This prevents resetting the state for each partial message
 		if (!this.isStreaming) {
 			this.isStreaming = true
 			this.currentStreamedMessage = ""
+			this.hasDisplayedPrefix = false
 			process.stdout.write("\n")
 		}
 
 		if (message.partialMessage?.type === "say") {
 			// Handle AI response
-			if (message.partialMessage.say === "ai_response") {
-				const content = message.partialMessage.content || ""
+			if (message.partialMessage.say === "text" || message.partialMessage.say === "ai_response") {
+				const content = message.partialMessage.text || message.partialMessage.content || ""
 
-				// If this is the first chunk, print the "Roo: " prefix
-				if (this.currentStreamedMessage === "") {
+				// Skip empty content messages
+				if (content.trim() === "") {
+					return
+				}
+
+				// Check if this is a duplicate message
+				if (this.isDuplicateMessage(content)) {
+					return
+				}
+
+				// If we haven't displayed the prefix yet, print the "Roo: " prefix
+				if (!this.hasDisplayedPrefix) {
 					process.stdout.write(chalk.bold.blue("Roo: "))
+					this.hasDisplayedPrefix = true
 				}
 
 				// Calculate the new content by comparing with what we've already displayed
@@ -320,20 +371,30 @@ export class Repl {
 				if (content.startsWith(this.currentStreamedMessage)) {
 					// Normal case: new content is appended
 					newContent = content.slice(this.currentStreamedMessage.length)
+				} else if (this.currentStreamedMessage.startsWith(content)) {
+					// Content is a subset of what we already have - ignore
+					return
 				} else {
 					// Handle case where content might be completely different
 					newContent = content
 					// Clear line and reprint if needed
 					if (this.currentStreamedMessage.length > 0) {
-						process.stdout.write("\r\n" + chalk.bold.blue("Roo: "))
+						// Don't add another "Roo: " prefix, we already have one
+						process.stdout.write("\r\n")
+						// Only print the prefix if we haven't already
+						if (!this.hasDisplayedPrefix) {
+							process.stdout.write(chalk.bold.blue("Roo: "))
+							this.hasDisplayedPrefix = true
+						}
 					}
 				}
 
-				// Print the new content
-				process.stdout.write(newContent)
-
-				// Update the current streamed message
-				this.currentStreamedMessage = content
+				// Only print if there's new content
+				if (newContent.length > 0) {
+					process.stdout.write(newContent)
+					// Update the current streamed message
+					this.currentStreamedMessage = content
+				}
 			}
 			// Handle tool execution
 			else if (message.partialMessage.say === "tool_execution") {
@@ -378,16 +439,65 @@ export class Repl {
 	 * @param message The state update message.
 	 */
 	private handleStateUpdate(message: any): void {
-		if (message.state) {
-			// Handle state updates if needed
-			display.debug("Received state update")
-		}
+		// State updates don't need special handling for the CLI
 
-		// End streaming if we were streaming
-		if (this.isStreaming) {
+		// Only end streaming if this is a final state update
+		// (e.g., when the task is completed or aborted)
+		if (this.isStreaming && message.state && (message.state.taskCompleted || message.state.taskAborted)) {
 			this.isStreaming = false
+			this.hasDisplayedPrefix = false
 			process.stdout.write("\n\n")
 			this.rl.prompt()
+		}
+	}
+
+	/**
+	 * Handles a taskEvent message from the IPC client.
+	 * @param message The taskEvent message.
+	 */
+	private handleTaskEvent(message: any): void {
+		// Check if this is a message event
+		if (message.eventName === "message" && message.payload && message.payload.length > 0) {
+			const messagePayload = message.payload[0]
+
+			// If this is an AI response, format it as a partialMessage and handle it
+			if (messagePayload.message && messagePayload.message.content) {
+				// Skip empty messages
+				if (!messagePayload.message.content.trim()) {
+					return
+				}
+
+				// If we're not already streaming, start streaming
+				if (!this.isStreaming) {
+					this.isStreaming = true
+					this.currentStreamedMessage = ""
+					this.hasDisplayedPrefix = false
+					process.stdout.write("\n")
+				}
+
+				const partialMessage = {
+					partialMessage: {
+						ts: Date.now(),
+						type: "say",
+						say: "text",
+						text: messagePayload.message.content,
+						partial: true,
+					},
+				}
+
+				// Process the message
+				this.handlePartialMessage(partialMessage)
+			}
+		}
+
+		// End streaming if we were streaming (for certain event types)
+		if (message.eventName === "taskCompleted" || message.eventName === "taskAborted") {
+			if (this.isStreaming) {
+				this.isStreaming = false
+				this.hasDisplayedPrefix = false
+				process.stdout.write("\n\n")
+				this.rl.prompt()
+			}
 		}
 	}
 
@@ -396,14 +506,17 @@ export class Repl {
 	 * @param message The action message.
 	 */
 	private handleAction(message: any): void {
-		if (message.action === "didBecomeVisible") {
-			// VS Code webview became visible
-			display.debug("VS Code webview became visible")
-		}
+		// Action messages don't need special handling for the CLI
 
-		// End streaming if we were streaming
-		if (this.isStreaming) {
+		// Only end streaming for specific actions that indicate completion
+		// like "taskCompleted" or "taskAborted"
+		if (
+			this.isStreaming &&
+			message.action &&
+			(message.action === "taskCompleted" || message.action === "taskAborted")
+		) {
 			this.isStreaming = false
+			this.hasDisplayedPrefix = false
 			process.stdout.write("\n\n")
 			this.rl.prompt()
 		}

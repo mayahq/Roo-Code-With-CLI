@@ -95,8 +95,10 @@ export class IpcClient extends EventEmitter {
 							console.log(`Received client ID from server: ${message.clientId}`)
 						}
 
+						// Emit the message event for the REPL to handle
 						this.emit("message", message)
 					} catch (error) {
+						console.error(`[ERROR] Failed to parse message: ${error}`)
 						this.emit("error", new Error(`Failed to parse message: ${error}`))
 					}
 				})

@@ -210,11 +210,45 @@ export class API extends EventEmitter<RooCodeEvents> implements RooCodeAPI {
 						const extension = vscode.extensions.getExtension("mayalabs.roo-cline-with-cli")
 						if (extension && extension.exports && extension.exports.cliBridgeServer) {
 							// Send the message to the WebSocket client
-							const sent = extension.exports.cliBridgeServer.sendMessageToClientById(wsClientId, {
-								type: "taskEvent",
-								eventName,
-								payload: args,
-							})
+							// For message events, we need to format it as a partialMessage for the CLI
+							let messageToSend
+							if (eventName === RooCodeEventName.Message) {
+								// Format as partialMessage for the CLI
+								const messagePayload = args[0] // Extract the message payload
+
+								// Make sure we have content to send
+								const content = messagePayload.message.content || ""
+								if (content.trim()) {
+									messageToSend = {
+										type: "partialMessage",
+										partialMessage: {
+											ts: Date.now(),
+											type: "say",
+											say: "text",
+											text: content,
+											partial: true,
+										},
+									}
+									this.log(
+										`[API Emit WS] Formatted message event as partialMessage for CLI client ${wsClientId}: ${content.substring(0, 50)}...`,
+									)
+								} else {
+									this.log(`[API Emit WS] Skipping empty message for CLI client ${wsClientId}`)
+									return // Skip sending empty messages
+								}
+							} else {
+								// For other events, use the standard format
+								messageToSend = {
+									type: "taskEvent",
+									eventName,
+									payload: args,
+								}
+							}
+
+							const sent = extension.exports.cliBridgeServer.sendMessageToClientById(
+								wsClientId,
+								messageToSend,
+							)
 							if (sent) {
 								this.log(
 									`[API Emit WS] Sent ${eventName} for task ${taskId} to WebSocket client ${wsClientId}`,
@@ -595,10 +629,27 @@ export class API extends EventEmitter<RooCodeEvents> implements RooCodeAPI {
 			// Correct signature for 'message' event based on ClineEvents
 			cline.on("message", async (messageArgs: { action: "created" | "updated"; message: any }) => {
 				const taskId = cline.taskId // Get taskId from cline instance
+
+				// Log the message content for debugging
+				this.log(
+					`[API] Message event from cline: action=${messageArgs.action}, content=${messageArgs.message.content?.substring(0, 100) || "none"}...`,
+				)
+
 				// Construct the payload expected by RooCodeEvents["message"]
 				const payload: RooCodeEvents["message"] = [{ taskId: taskId, ...messageArgs }]
-				super.emit(RooCodeEventName.Message, payload[0]) // Emit locally with correct payload structure (pass object)
-				this.sendIpcEvent(RooCodeEventName.Message, taskId, payload) // Forward via IPC (pass array)
+
+				// Emit locally with correct payload structure (pass object)
+				super.emit(RooCodeEventName.Message, payload[0])
+
+				// Check if there are any WebSocket clients registered for this task
+				const clientIds = this.taskIdToClientIdMap.get(taskId) || []
+				const wsClients = clientIds.filter((id) => id.startsWith(this.WS_CLIENT_PREFIX))
+				if (wsClients.length > 0) {
+					this.log(`[API] Sending message event to ${wsClients.length} WebSocket clients for task ${taskId}`)
+				}
+
+				// Forward via IPC (pass array)
+				this.sendIpcEvent(RooCodeEventName.Message, taskId, payload)
 
 				if (messageArgs.message.partial !== true) {
 					await this.fileLog(

@@ -102,6 +102,19 @@ export class CliBridgeServer {
 						const taskId = currentCline.taskId
 						this.logger.info(`Registering WebSocket client ${clientId} for current task ${taskId}`)
 						api.registerWebSocketClientForTask(taskId, clientId)
+
+						// Force a message to be sent to confirm registration
+						setTimeout(() => {
+							this.sendMessageToClientById(clientId, {
+								type: "partialMessage",
+								partialMessage: {
+									ts: Date.now(), // Add timestamp
+									type: "say",
+									say: "text", // Use "text" instead of "ai_response" to match the expected type
+									text: "Connection established. You can now chat with Roo.",
+								},
+							})
+						}, 500)
 					}
 				}
 			} else {
@@ -272,12 +285,29 @@ export class CliBridgeServer {
 
 	// Send message to a specific client by ID
 	public sendMessageToClientById(clientId: string, message: ExtensionMessage): boolean {
+		this.logger.info(`Attempting to send message to client ${clientId}: ${message.type}`)
+
 		const ws = this.connectedClients.get(clientId)
-		if (ws && ws.readyState === WebSocket.OPEN) {
-			ws.send(JSON.stringify(message))
-			return true
+		if (!ws) {
+			this.logger.warn(`Client ${clientId} not found in connectedClients map`)
+			return false
 		}
-		return false
+
+		if (ws.readyState !== WebSocket.OPEN) {
+			this.logger.warn(`Client ${clientId} connection is not open (readyState: ${ws.readyState})`)
+			return false
+		}
+
+		try {
+			const messageString = JSON.stringify(message)
+			this.logger.debug(`Sending message to client ${clientId}: ${messageString}`)
+			ws.send(messageString)
+			this.logger.info(`Successfully sent message to client ${clientId}`)
+			return true
+		} catch (error) {
+			this.logger.error(`Error sending message to client ${clientId}: ${error}`)
+			return false
+		}
 	}
 
 	private async writePortFile(): Promise<void> {

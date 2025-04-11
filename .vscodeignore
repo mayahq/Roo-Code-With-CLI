@@ -31,9 +31,12 @@ demo.gif
 .prettierignore
 .clinerules*
 .roomodes
+.roo/**
 cline_docs/**
 coverage/**
 locales/**
+benchmark/**
+.direnv/**
 
 # Ignore all webview-ui files except the build directory (https://github.com/microsoft/vscode-webview-ui-toolkit-samples/blob/main/frameworks/hello-world-react-cra/.vscodeignore)
 webview-ui/src/**

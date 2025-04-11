@@ -101,7 +101,7 @@
 		"searchPlaceholder": "Pesquisar perfis",
 		"noMatchFound": "Nenhum perfil correspondente encontrado",
 		"vscodeLmDescription": "A API do Modelo de Linguagem do VS Code permite executar modelos fornecidos por outras extensões do VS Code (incluindo, mas não se limitando, ao GitHub Copilot). A maneira mais fácil de começar é instalar as extensões Copilot e Copilot Chat no VS Code Marketplace.",
-		"awsCustomArnUse": "Insira um ARN AWS Bedrock válido para o modelo que deseja usar. Exemplos de formato:",
+		"awsCustomArnUse": "Insira um ARN Amazon Bedrock válido para o modelo que deseja usar. Exemplos de formato:",
 		"awsCustomArnDesc": "Certifique-se de que a região no ARN corresponde à região AWS selecionada acima.",
 		"openRouterApiKey": "Chave de API OpenRouter",
 		"getOpenRouterApiKey": "Obter chave de API OpenRouter",
@@ -109,6 +109,8 @@
 		"glamaApiKey": "Chave de API Glama",
 		"getGlamaApiKey": "Obter chave de API Glama",
 		"useCustomBaseUrl": "Usar URL base personalizado",
+		"useHostHeader": "Usar cabeçalho Host personalizado",
+		"useLegacyFormat": "Usar formato de API OpenAI legado",
 		"requestyApiKey": "Chave de API Requesty",
 		"getRequestyApiKey": "Obter chave de API Requesty",
 		"openRouterTransformsText": "Comprimir prompts e cadeias de mensagens para o tamanho do contexto (<a>Transformações OpenRouter</a>)",
@@ -218,6 +220,10 @@
 				}
 			},
 			"resetDefaults": "Restaurar Padrões"
+		},
+		"rateLimitSeconds": {
+			"label": "Limite de taxa",
+			"description": "Tempo mínimo entre requisições de API."
 		}
 	},
 	"browser": {
@@ -298,10 +304,6 @@
 		}
 	},
 	"advanced": {
-		"rateLimit": {
-			"label": "Limite de taxa",
-			"description": "Tempo mínimo entre requisições de API."
-		},
 		"diff": {
 			"label": "Ativar edição através de diffs",
 			"description": "Quando ativado, o Roo poderá editar arquivos mais rapidamente e rejeitará automaticamente escritas completas de arquivos truncados. Funciona melhor com o modelo mais recente Claude 3.7 Sonnet.",
@@ -401,7 +403,7 @@
 	},
 	"validation": {
 		"apiKey": "Você deve fornecer uma chave de API válida.",
-		"awsRegion": "Você deve escolher uma região para usar o AWS Bedrock.",
+		"awsRegion": "Você deve escolher uma região para usar o Amazon Bedrock.",
 		"googleCloud": "Você deve fornecer um ID de projeto e região do Google Cloud válidos.",
 		"modelId": "Você deve fornecer um ID de modelo válido.",
 		"modelSelector": "Você deve fornecer um seletor de modelo válido.",

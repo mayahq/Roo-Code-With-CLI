@@ -11,7 +11,6 @@ English • [Català](locales/ca/README.md) • [Deutsch](locales/de/README.md) 
 </sub>
 </div>
 <br>
-
 <div align="center">
   <h1>Roo Code With CLI</h1>
   <h3>A fork of Roo Code with CLI control capabilities</h3>

@@ -101,7 +101,7 @@
 		"searchPlaceholder": "Buscar perfiles",
 		"noMatchFound": "No se encontraron perfiles coincidentes",
 		"vscodeLmDescription": "La API del Modelo de Lenguaje de VS Code le permite ejecutar modelos proporcionados por otras extensiones de VS Code (incluido, entre otros, GitHub Copilot). La forma más sencilla de empezar es instalar las extensiones Copilot y Copilot Chat desde el VS Code Marketplace.",
-		"awsCustomArnUse": "Ingrese un ARN de AWS Bedrock válido para el modelo que desea utilizar. Ejemplos de formato:",
+		"awsCustomArnUse": "Ingrese un ARN de Amazon Bedrock válido para el modelo que desea utilizar. Ejemplos de formato:",
 		"awsCustomArnDesc": "Asegúrese de que la región en el ARN coincida con la región de AWS seleccionada anteriormente.",
 		"openRouterApiKey": "Clave API de OpenRouter",
 		"getOpenRouterApiKey": "Obtener clave API de OpenRouter",
@@ -109,6 +109,8 @@
 		"glamaApiKey": "Clave API de Glama",
 		"getGlamaApiKey": "Obtener clave API de Glama",
 		"useCustomBaseUrl": "Usar URL base personalizada",
+		"useHostHeader": "Usar encabezado Host personalizado",
+		"useLegacyFormat": "Usar formato API de OpenAI heredado",
 		"requestyApiKey": "Clave API de Requesty",
 		"getRequestyApiKey": "Obtener clave API de Requesty",
 		"openRouterTransformsText": "Comprimir prompts y cadenas de mensajes al tamaño del contexto (<a>Transformaciones de OpenRouter</a>)",
@@ -218,6 +220,10 @@
 				}
 			},
 			"resetDefaults": "Restablecer valores predeterminados"
+		},
+		"rateLimitSeconds": {
+			"label": "Límite de tasa",
+			"description": "Tiempo mínimo entre solicitudes de API."
 		}
 	},
 	"browser": {
@@ -298,10 +304,6 @@
 		}
 	},
 	"advanced": {
-		"rateLimit": {
-			"label": "Límite de tasa",
-			"description": "Tiempo mínimo entre solicitudes de API."
-		},
 		"diff": {
 			"label": "Habilitar edición a través de diffs",
 			"description": "Cuando está habilitado, Roo podrá editar archivos más rápidamente y rechazará automáticamente escrituras completas de archivos truncados. Funciona mejor con el último modelo Claude 3.7 Sonnet.",
@@ -401,7 +403,7 @@
 	},
 	"validation": {
 		"apiKey": "Debe proporcionar una clave API válida.",
-		"awsRegion": "Debe elegir una región para usar con AWS Bedrock.",
+		"awsRegion": "Debe elegir una región para usar con Amazon Bedrock.",
 		"googleCloud": "Debe proporcionar un ID de proyecto y región de Google Cloud válidos.",
 		"modelId": "Debe proporcionar un ID de modelo válido.",
 		"modelSelector": "Debe proporcionar un selector de modelo válido.",

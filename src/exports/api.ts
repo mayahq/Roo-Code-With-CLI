@@ -19,7 +19,6 @@ type MessageEventArgs = { taskId: string; action: "created" | "updated"; message
 export class API extends EventEmitter<RooCodeEvents> implements RooCodeAPI {
 	private readonly outputChannel: vscode.OutputChannel
 	private readonly sidebarProvider: ClineProvider
-	private tabProvider?: ClineProvider
 	private readonly context: vscode.ExtensionContext
 	private readonly ipc?: IpcServer
 	private readonly taskIdToClientIdMap = new Map<string, string[]>() // Changed to store multiple clients per task
@@ -349,11 +348,16 @@ export class API extends EventEmitter<RooCodeEvents> implements RooCodeAPI {
 		newTab?: boolean
 	}): Promise<string> {
 		let provider: ClineProvider
-		if (newTab || !this.tabProvider) {
-			this.tabProvider = await openClineInNewTab({ context: this.context, outputChannel: this.outputChannel })
-			this.registerListeners(this.tabProvider) // Register listeners for new tab provider
-			provider = this.tabProvider
+
+		if (newTab) {
+			await vscode.commands.executeCommand("workbench.action.files.revert")
+			await vscode.commands.executeCommand("workbench.action.closeAllEditors")
+
+			provider = await openClineInNewTab({ context: this.context, outputChannel: this.outputChannel })
+			this.registerListeners(provider)
 		} else {
+			await vscode.commands.executeCommand("roo-cline.SidebarProvider.focus")
+
 			provider = this.sidebarProvider
 		}
 
@@ -384,12 +388,27 @@ export class API extends EventEmitter<RooCodeEvents> implements RooCodeAPI {
 		return taskId
 	}
 
-	public getCurrentTaskStack(): string[] {
+	public async resumeTask(taskId: string): Promise<void> {
+		const { historyItem } = await this.sidebarProvider.getTaskWithId(taskId)
+		await this.sidebarProvider.initClineWithHistoryItem(historyItem)
+		await this.sidebarProvider.postMessageToWebview({ type: "action", action: "chatButtonClicked" })
+	}
+
+	public async isTaskInHistory(taskId: string): Promise<boolean> {
+		try {
+			await this.sidebarProvider.getTaskWithId(taskId)
+			return true
+		} catch {
+			return false
+		}
+	}
+
+	public getCurrentTaskStack() {
 		return this.sidebarProvider.getCurrentTaskStack()
 	}
 
 	public async clearCurrentTask(lastMessage?: string) {
-		await this.sidebarProvider.finishSubTask(lastMessage)
+		await this.sidebarProvider.finishSubTask(lastMessage ?? "")
 		await this.sidebarProvider.postStateToWebview()
 	}
 
